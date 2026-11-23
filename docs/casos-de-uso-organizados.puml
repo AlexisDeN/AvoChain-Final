@@ -1,0 +1,150 @@
+@startuml CU-AvoChain-Operacion
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+title AvoChain - Casos de uso operativos
+
+actor Productor
+actor "Inspector de calidad" as Inspector
+actor Bodeguero
+actor "Conductor / Transportador" as Conductor
+actor Receptor
+actor Vendedor
+actor "Cliente final" as Cliente
+
+rectangle "AvoChain - Operación del lote" {
+  package "Producción" {
+    usecase "Registrar lote" as Registrar
+    usecase "Adjuntar evidencia\nfotográfica" as Evidencia
+    usecase "Consultar mis lotes" as MisLotes
+  }
+  package "Calidad y despacho" {
+    usecase "Inspeccionar calidad" as Calidad
+    usecase "Validar parámetros\ny destino" as ValidarCalidad
+    usecase "Adjuntar informe PDF" as Informe
+    usecase "Generar QR" as QR
+    usecase "Despachar y asignar\nconductor y ruta" as Despachar
+  }
+  package "Transporte y recepción" {
+    usecase "Consultar lotes\ny ruta asignados" as VerRuta
+    usecase "Registrar lectura QR" as LeerQR
+    usecase "Registrar punto\nde control" as PuntoControl
+    usecase "Reportar incidente" as Incidente
+    usecase "Capturar ubicación\ndel incidente" as Ubicacion
+    usecase "Confirmar recepción\nen destino" as Recepcion
+    usecase "Validar estado, rol,\ntemperatura y daños" as ValidarRecepcion
+  }
+  package "Venta y consulta pública" {
+    usecase "Consultar origen e\nhistorial del lote" as Origen
+    usecase "Registrar venta" as Venta
+  }
+}
+
+Productor -- Registrar
+Productor -- MisLotes
+Evidencia ..> Registrar : <<extend>>
+
+Inspector -- Calidad
+Calidad ..> ValidarCalidad : <<include>>
+Calidad ..> Informe : <<include>>
+Bodeguero -- QR
+Bodeguero -- Despachar
+
+Conductor -- VerRuta
+Conductor -- LeerQR
+Conductor -- PuntoControl
+Conductor -- Incidente
+Incidente ..> Ubicacion : <<include>>
+Receptor -- Recepcion
+Recepcion ..> ValidarRecepcion : <<include>>
+
+Vendedor -- Origen
+Vendedor -- Venta
+Cliente -- Origen
+
+note bottom of Despachar
+  Precondición: calidad aprobada y QR generado.
+  El conductor registra ruta, controles e incidentes.
+  El receptor confirma la llegada y el cambio de custodia.
+end note
+
+note bottom of Origen
+  Consulta pública. Si el producto ya se vendió,
+  se muestra el historial y se advierte que el QR
+  no se debe reutilizar.
+end note
+@enduml
+
+@startuml CU-AvoChain-Administracion
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+title AvoChain - Casos de uso de administración
+
+actor Administrador as Admin
+
+rectangle "AvoChain - Administración" {
+  usecase "Registrar cuentas\ny asignar roles" as Usuarios
+  usecase "Editar usuarios\ny estado de cuenta" as EditarUsuarios
+  usecase "Registrar y editar\nfincas" as Fincas
+  usecase "Buscar y filtrar\nusuarios" as BuscarUsuarios
+  usecase "Buscar y filtrar\nfincas" as BuscarFincas
+  usecase "Buscar y filtrar lotes" as BuscarLotes
+  usecase "Consultar dashboard" as Dashboard
+  usecase "Consultar detalle y\ntrazabilidad de cualquier lote" as Trazabilidad
+}
+
+Admin -- Usuarios
+Admin -- EditarUsuarios
+Admin -- Fincas
+Admin -- BuscarUsuarios
+Admin -- BuscarFincas
+Admin -- BuscarLotes
+Admin -- Dashboard
+Admin -- Trazabilidad
+
+note bottom of Trazabilidad
+  El administrador puede consultar la trazabilidad global
+  por su rol. El plan Premium corresponde al productor
+  y no es requisito para las funciones de administración.
+end note
+@enduml
+
+@startuml CU-AvoChain-Premium
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+title AvoChain - Seguimiento Premium del productor
+
+actor Productor
+actor "Pasarela Wompi" as Wompi
+
+rectangle "AvoChain - Plan del productor" {
+  usecase "Consultar mis lotes" as MisLotes
+  usecase "Pagar plan Premium" as Pagar
+  usecase "Verificar pago y\nactivar Premium" as Activar
+  usecase "Consultar detalle completo\nde mis lotes" as Detalle
+  usecase "Generar informe PDF\nde producción" as Informe
+}
+
+Productor -- MisLotes
+Productor -- Pagar
+Productor -- Detalle
+Productor -- Informe
+Wompi -- Pagar
+Pagar ..> Activar : <<include>>
+Informe ..> Detalle : <<include>>
+
+note bottom of MisLotes
+  Todos los productores pueden consultar la lista
+  de sus propios lotes, aunque no tengan Premium.
+end note
+
+note bottom of Detalle
+  Requiere Premium activo y solo permite consultar
+  los lotes que pertenecen al productor autenticado.
+end note
+@enduml

@@ -1,0 +1,49 @@
+﻿@startuml AvoChain-Despliegue
+ title Despliegue de AvoChain — desarrollo local
+
+ skinparam shadowing false
+ skinparam backgroundColor #FFFFFF
+ skinparam defaultFontName Arial
+ skinparam defaultFontSize 14
+ skinparam ArrowColor #263746
+ skinparam NodeBorderColor #49769B
+ skinparam NodeBackgroundColor #F4F8FC
+ skinparam ArtifactBorderColor #286090
+ skinparam ArtifactBackgroundColor #FFFFFF
+ skinparam DatabaseBorderColor #54845D
+ skinparam DatabaseBackgroundColor #F2F8F3
+ skinparam CloudBorderColor #888888
+ skinparam CloudBackgroundColor #F4F4F4
+
+ actor "Usuarios de AvoChain\nAdministrador · Productor\nInspector de calidad · Bodeguero\nTransportador · Receptor · Vendedor" as usuarios
+
+ node "Equipo cliente\nWindows / dispositivo del usuario" as cliente {
+   node "Navegador web\nChrome / Edge" as browser {
+     artifact "Interfaz AvoChain\npublic/index.html\nHTML · CSS · JavaScript" as frontend
+   }
+ }
+
+ node "Servidor AvoChain\nEquipo de desarrollo" as host {
+   node "Proceso de aplicación\nNode.js · Express" as app {
+     artifact "Servidor web y API REST\nHTTP local · puerto 3001\nEndpoints /api/v1\nJWT y permisos por rol\nServicios de negocio" as api
+   }
+   node "Docker Engine\ndocker-compose.yml" as docker {
+     database "Contenedor MongoDB 8\nBase avochain\nPuerto host 27018 → contenedor 27017\n\nUsuarios · fincas · lotes\nEventos · pagos · Premium\nSolicitudes de vinculación" as mongo
+   }
+ }
+
+ cloud "Wompi\nCheckout y notificaciones\nHTTPS · si se configura" as wompi
+ cloud "Proveedor SMTP\nEnlaces de activación\nSMTP · si se configura" as smtp
+
+ usuarios --> frontend : Usa la interfaz
+ frontend --> api : HTTP · JSON · JWT\nlocalhost:3001
+ api --> mongo : MongoDB driver\nlocalhost:27018
+ api ..> wompi : HTTPS opcional
+ api ..> smtp : SMTP opcional
+
+ note bottom of app
+   Blockchain, QR e IPFS son adaptadores simulados
+   dentro de la aplicación, no servidores externos.
+ end note
+
+@enduml

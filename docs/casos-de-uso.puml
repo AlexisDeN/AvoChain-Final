@@ -1,0 +1,116 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor Administrador as Admin
+actor Productor
+actor "Inspector de calidad" as Inspector
+actor Bodeguero
+actor "Conductor / Transportador" as Conductor
+actor Receptor
+actor Vendedor
+actor "Cliente final" as Cliente
+actor "Pasarela Wompi" as Wompi
+
+rectangle "Sistema AvoChain" {
+  package "Administración" {
+    usecase "Iniciar sesión" as UC_Login
+    usecase "Registrar y gestionar\nusuarios y roles" as UC_Users
+    usecase "Registrar y editar fincas" as UC_Farms
+    usecase "Buscar usuarios, fincas\ny lotes" as UC_Search
+    usecase "Consultar dashboard\ny trazabilidad global" as UC_AdminTrace
+  }
+
+  package "Producción y seguimiento" {
+    usecase "Registrar lote" as UC_RegisterLot
+    usecase "Adjuntar evidencia\nfotográfica" as UC_Photos
+    usecase "Consultar mis lotes" as UC_MyLots
+    usecase "Pagar / activar Premium" as UC_Premium
+    usecase "Consultar detalle completo\nde mis lotes" as UC_PremiumTrace
+    usecase "Generar informe PDF\nde producción" as UC_Report
+  }
+
+  package "Calidad y bodega" {
+    usecase "Inspeccionar calidad" as UC_Quality
+    usecase "Validar humedad,\ntemperatura y destino" as UC_ValidateQuality
+    usecase "Adjuntar informe PDF" as UC_QualityPDF
+    usecase "Generar QR del lote" as UC_QR
+    usecase "Despachar lote y asignar\nconductor y ruta" as UC_Dispatch
+  }
+
+  package "Transporte y recepción" {
+    usecase "Consultar lotes y ruta\nasignados" as UC_Route
+    usecase "Registrar lectura del QR" as UC_ScanQR
+    usecase "Registrar punto de control" as UC_Checkpoint
+    usecase "Reportar incidente\nde ruta" as UC_Incident
+    usecase "Registrar ubicación\ndel incidente" as UC_Location
+    usecase "Confirmar recepción\nen destino" as UC_Receive
+    usecase "Validar estado, rol,\ntemperatura y daños" as UC_ValidateReceive
+  }
+
+  package "Venta y consulta pública" {
+    usecase "Consultar origen y proceso\ncompleto del lote" as UC_Origin
+    usecase "Marcar lote vendido" as UC_Sell
+  }
+}
+
+Admin -- UC_Login
+Productor -- UC_Login
+Inspector -- UC_Login
+Bodeguero -- UC_Login
+Conductor -- UC_Login
+Receptor -- UC_Login
+Vendedor -- UC_Login
+
+Admin -- UC_Users
+Admin -- UC_Farms
+Admin -- UC_Search
+Admin -- UC_AdminTrace
+
+Productor -- UC_RegisterLot
+Productor -- UC_MyLots
+Productor -- UC_Premium
+Productor -- UC_PremiumTrace
+Productor -- UC_Report
+UC_Photos ..> UC_RegisterLot : <<extend>>
+UC_Report ..> UC_MyLots : <<include>>
+Wompi -- UC_Premium
+
+Inspector -- UC_Quality
+UC_Quality ..> UC_ValidateQuality : <<include>>
+UC_Quality ..> UC_QualityPDF : <<include>>
+Bodeguero -- UC_QR
+Bodeguero -- UC_Dispatch
+
+Conductor -- UC_Route
+Conductor -- UC_ScanQR
+Conductor -- UC_Checkpoint
+Conductor -- UC_Incident
+UC_Incident ..> UC_Location : <<include>>
+Receptor -- UC_Receive
+UC_Receive ..> UC_ValidateReceive : <<include>>
+
+Vendedor -- UC_Origin
+Vendedor -- UC_Sell
+Cliente -- UC_Origin
+
+note bottom of UC_QR
+  El QR se genera después de aprobar calidad.
+  Un lote rechazado no puede despacharse.
+end note
+
+note bottom of UC_Receive
+  La confirmación del receptor registra
+  el cambio de custodia y cambia el lote
+  a "En Punto de Venta".
+end note
+
+note bottom of UC_AdminTrace
+  Las operaciones privadas requieren
+  inicio de sesión y permisos del rol.
+  El productor consulta solo sus lotes;
+  el detalle completo requiere Premium.
+end note
+
+@enduml

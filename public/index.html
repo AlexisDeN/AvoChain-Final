@@ -1,0 +1,2610 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AvoChain - Trazabilidad de Aguacate</title>
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem("avochain-theme") || "dark"; }
+    catch { document.documentElement.dataset.theme = "dark"; }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+    body {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      background: #08120f;
+      color: #f3f4f6;
+      padding: 16px;
+      background-image: radial-gradient(ellipse at 6% 0%, rgba(132, 204, 22, .18), transparent 32%), radial-gradient(ellipse at 96% 8%, rgba(16, 185, 129, .12), transparent 30%), linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: auto, auto, 34px 34px, 34px 34px;
+      background-attachment: fixed;
+    }
+
+    .panel {
+      background: rgba(17, 27, 25, .92);
+      border: 1px solid rgba(148, 163, 184, .17);
+      border-radius: 22px;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, .2);
+      backdrop-filter: blur(14px);
+    }
+
+    .control {
+      width: 100%;
+      background: #10171a;
+      border: 1px solid #35434a;
+      border-radius: 11px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 14px;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .control::placeholder { color: #829098; }
+    .control:focus { border-color: #84cc16; box-shadow: 0 0 0 3px rgba(132, 204, 22, .13); }
+
+    .control:focus-visible,
+    .btn:focus-visible,
+    a:focus-visible,
+    input[type="radio"]:focus-visible,
+    select:focus-visible {
+      outline: 3px solid #a3e635;
+      outline-offset: 2px;
+    }
+
+    .btn {
+      border-radius: 11px;
+      padding: 10px 15px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      font-size: 13px;
+      letter-spacing: .005em;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, background .18s ease;
+    }
+
+    .btn:not(:disabled):hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 7px 18px rgba(0, 0, 0, .2); }
+    .btn:disabled { cursor: not-allowed; opacity: .55; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #bef264, #84cc16 58%, #65a30d);
+      color: #14210a;
+      box-shadow: 0 7px 22px rgba(101, 163, 13, .22);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(31, 61, 44, .9), rgba(24, 43, 36, .9));
+      color: #d9f99d;
+      border: 1px solid rgba(132, 204, 22, .35);
+    }
+
+    .btn-danger {
+      background: rgba(225, 29, 72, .16);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, .55);
+    }
+
+    .role-active {
+      background: linear-gradient(135deg, #315e31, #183e2b) !important;
+      color: #d9f99d !important;
+      border-color: rgba(163, 230, 53, .66) !important;
+      box-shadow: 0 6px 18px rgba(101, 163, 13, .2), inset 0 1px rgba(255,255,255,.12);
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #334155;
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #334155;
+      padding: 8px;
+      text-align: left;
+      font-size: 11px;
+    }
+
+    th {
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, .65);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .app-main {
+      width: min(100%, 1580px);
+      margin-inline: auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      gap: 16px;
+    }
+
+    .app-header,
+    .role-nav,
+    .premium-panel {
+      grid-column: 1 / -1;
+    }
+
+    .workspace {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .workspace-content {
+      width: 100%;
+      min-height: 65vh;
+      padding: 24px;
+      background: linear-gradient(145deg, rgba(13, 22, 19, .98), rgba(15, 23, 27, .98)) !important;
+    }
+
+    .role-view {
+      width: 100%;
+      max-width: none;
+      margin-inline: auto;
+    }
+
+    .app-header { min-height: 76px; background: linear-gradient(110deg, rgba(17, 41, 31, .98), rgba(18, 29, 34, .96)); border-color: rgba(163, 230, 53, .22); }
+    .app-header > div:first-child > div:first-child { box-shadow: 0 0 24px rgba(132, 204, 22, .12); }
+    .app-header > div:last-child { flex-wrap: wrap; justify-content: flex-end; }
+    .role-nav { position: sticky; top: 10px; z-index: 20; backdrop-filter: blur(16px); background: rgba(15, 24, 22, .94); border-color: rgba(148, 163, 184, .2); }
+    .role-nav button { min-height: 48px; border: 1px solid transparent; }
+    .role-nav button:not(.role-active):not(:disabled):hover { color: #ecfccb; border-color: rgba(148, 163, 184, .2); background: rgba(255,255,255,.045); }
+    .premium-panel { background: linear-gradient(120deg, rgba(37, 65, 32, .82), rgba(18, 33, 28, .97) 48%, rgba(22, 31, 34, .96)); border-color: rgba(163, 230, 53, .24); }
+    .premium-panel > article { background: rgba(4, 12, 10, .28); }
+    .workspace { overflow: hidden; }
+    .workspace-content { border-radius: 22px; }
+    .workspace-content .role-view > div:first-child {
+      position: relative;
+      overflow: hidden;
+      padding: 20px 22px;
+      border: 1px solid rgba(148, 163, 184, .16);
+      border-radius: 18px;
+      background: linear-gradient(115deg, rgba(30, 54, 38, .72), rgba(24, 34, 38, .72));
+      box-shadow: inset 0 1px rgba(255,255,255,.04);
+    }
+    .workspace-content .role-view > div:first-child::after {
+      content: ""; position: absolute; width: 180px; height: 180px; top: -110px; right: -45px;
+      border: 1px solid rgba(190, 242, 100, .1); border-radius: 50%;
+      box-shadow: 0 0 0 24px rgba(190, 242, 100, .025), 0 0 0 50px rgba(190, 242, 100, .02); pointer-events: none;
+    }
+    .workspace-content .role-view > div:first-child h2 { font-size: clamp(1.35rem, 2.4vw, 1.8rem); }
+    .workspace-content .role-view > div:first-child > p:first-child { font-size: 11px; letter-spacing: .14em; }
+    .workspace-content .role-view > div:first-child > p:nth-child(3) { position: relative; z-index: 1; max-width: 58ch; margin-top: 6px; color: #b6c4bd; font-size: 13px; }
+    .role-view > section, .role-view > .rounded-xl, .role-view > .rounded-lg { border-radius: 18px; }
+    .role-view > section, .role-view > .rounded-xl { box-shadow: 0 8px 24px rgba(0, 0, 0, .12), inset 0 1px rgba(255,255,255,.025); }
+    .role-view > section h3 { font-size: 14px; }
+    .role-view > section p { line-height: 1.6; }
+    .role-view label { color: #cbd5d1; }
+    .workspace-content .control, .workspace-content .btn { border-radius: 12px; }
+    .workspace-content > .role-view > h2,
+    .workspace-content .role-view > div:first-child h2 { letter-spacing: -.025em; }
+    .table-wrap { box-shadow: inset 0 1px rgba(255,255,255,.02); }
+    .table-wrap table { min-width: 760px; }
+    .theme-toggle { white-space: nowrap; }
+    [data-view="admin"] > * { min-width: 0; margin-top: 0 !important; }
+    [data-view="admin"] > section,
+    [data-view="admin"] > .table-wrap { border-radius: 14px; }
+    [data-view="admin"] > section { padding: 16px; }
+    [data-view="admin"] > section > h3 { font-size: 14px; }
+    [data-view="admin"] .table-wrap { max-height: min(42vh, 420px); }
+    [data-view="admin"] .table-wrap th,
+    [data-view="admin"] .table-wrap td { padding: 10px 12px; }
+    [data-view="admin"] .table-wrap .control { min-width: 145px; }
+
+    html[data-theme="light"] { color-scheme: light; }
+    html[data-theme="light"] body {
+      color: #1e2a27;
+      background-color: #f2f6f3;
+      background-image: radial-gradient(ellipse at 5% 0%, rgba(101, 163, 13, .11), transparent 32%), radial-gradient(ellipse at 100% 12%, rgba(16, 185, 129, .08), transparent 28%), linear-gradient(rgba(22, 101, 52, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(22, 101, 52, .035) 1px, transparent 1px);
+    }
+    html[data-theme="light"] .panel { background: #ffffff; border-color: #dbe5de; box-shadow: 0 12px 32px rgba(31, 52, 40, .07); }
+    html[data-theme="light"] .app-header { background: linear-gradient(110deg, #f0f8ef, #ffffff 52%, #f1f7f8); }
+    html[data-theme="light"] .role-nav { background: rgba(255,255,255,.95); }
+    html[data-theme="light"] .premium-panel { background: linear-gradient(120deg, #e9f5df, #f9fcf9 54%, #eef6f4); }
+    html[data-theme="light"] .premium-panel > article { background: rgba(255,255,255,.62); }
+    html[data-theme="light"] .workspace-content { background: linear-gradient(145deg, #f8fbf8, #f1f6f4) !important; }
+    html[data-theme="light"] .workspace-content .role-view > div:first-child { background: linear-gradient(115deg, #edf6e9, #f3f7f7); border-color: #d7e4d8; box-shadow: inset 0 1px #fff; }
+    html[data-theme="light"] .workspace-content .role-view > div:first-child > p:nth-child(3) { color: #5b6b62; }
+    html[data-theme="light"] .role-view > section, html[data-theme="light"] .role-view > .rounded-xl { box-shadow: 0 8px 24px rgba(31, 52, 40, .055), inset 0 1px #fff; }
+    html[data-theme="light"] .role-nav button:not(.role-active):not(:disabled):hover { color: #315d1c; background: #f0f6ef; }
+    html[data-theme="light"] .control { background: #ffffff; border-color: #cbd8d0; color: #17231e; }
+    html[data-theme="light"] .control::placeholder { color: #718078; }
+    html[data-theme="light"] .btn-secondary { background: #e7f2e9; color: #245b32; border-color: #b9d8bf; }
+    html[data-theme="light"] .btn-danger { background: #fff0f1; color: #a5243b; border-color: #efb7c0; }
+    html[data-theme="light"] .role-active { background: #e4f2df !important; color: #315d1c !important; border-color: #91c66d !important; }
+    html[data-theme="light"] .table-wrap { border-color: #d4dfd8; }
+    html[data-theme="light"] th { color: #40524a; background: #edf3ef; }
+    html[data-theme="light"] td { color: #293a32; border-color: #e0e8e3; }
+    html[data-theme="light"] .app-toast { background: #ffffff; color: #24342c; border-color: #cbd8d0; box-shadow: 0 14px 38px rgba(31, 52, 40, .16); }
+    html[data-theme="light"] .app-toast.toast-error { color: #9f2437; }
+    html[data-theme="light"] .bg-slate-950,
+    html[data-theme="light"] .bg-slate-900,
+    html[data-theme="light"] .bg-slate-800 { background-color: #ffffff !important; }
+    html[data-theme="light"] .bg-black\/20,
+    html[data-theme="light"] .bg-black\/25,
+    html[data-theme="light"] .bg-black\/40 { background-color: #edf3ef !important; }
+    html[data-theme="light"] .border-slate-900,
+    html[data-theme="light"] .border-slate-800,
+    html[data-theme="light"] .border-slate-700 { border-color: #d6e1da !important; }
+    html[data-theme="light"] .text-white,
+    html[data-theme="light"] .text-slate-100,
+    html[data-theme="light"] .text-slate-200,
+    html[data-theme="light"] .text-slate-300 { color: #26372f !important; }
+    html[data-theme="light"] .text-slate-400,
+    html[data-theme="light"] .text-slate-500 { color: #617168 !important; }
+    html[data-theme="light"] .text-lime-200,
+    html[data-theme="light"] .text-lime-300 { color: #477a1b !important; }
+    html[data-theme="light"] .text-emerald-200,
+    html[data-theme="light"] .text-emerald-300 { color: #176c49 !important; }
+    html[data-theme="light"] .text-amber-200,
+    html[data-theme="light"] .text-amber-300 { color: #8b5a0b !important; }
+    html[data-theme="light"] .text-cyan-200,
+    html[data-theme="light"] .text-cyan-300 { color: #0b6873 !important; }
+    html[data-theme="light"] .text-violet-200,
+    html[data-theme="light"] .text-violet-300 { color: #6841a5 !important; }
+    html[data-theme="light"] #pagoDemoModal { background: #ffffff; color: #24342c; }
+    html[data-theme="light"] #pagoDemoModal .bg-slate-950,
+    html[data-theme="light"] #pagoDemoModal .bg-slate-900 { background-color: #f5f8f6 !important; }
+    html[data-theme="light"] #pagoDemoModal > div:first-child { background: linear-gradient(115deg, #fff8e7, #f5f8f6) !important; }
+
+    .app-toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 100;
+      max-width: min(420px, calc(100vw - 32px));
+      border: 1px solid #475569;
+      border-radius: 12px;
+      padding: 12px 16px;
+      background: #17212b;
+      color: #e2e8f0;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, .45);
+      font-size: 13px;
+    }
+
+    @media print {
+      body * { visibility: hidden !important; }
+      #reportePremium, #reportePremium * { visibility: visible !important; }
+      #reportePremium { position: absolute; inset: 0 auto auto 0; width: 100%; margin: 0; padding: 0; color: #111 !important; background: #fff !important; font: 11pt Arial, sans-serif; }
+      #reportePremium * { color: #111 !important; background: #fff !important; border-color: #bbb !important; }
+    }
+
+    .app-toast.toast-success { border-color: rgba(132, 204, 22, .55); }
+    .app-toast.toast-error { border-color: rgba(244, 63, 94, .65); color: #fecdd3; }
+
+    @media (min-width: 1100px) {
+      body {
+        padding: 24px 32px;
+      }
+
+      .app-main {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+        gap: 20px;
+      }
+
+      .role-view { max-width: none; }
+
+      .app-header {
+        padding: 18px 22px;
+      }
+
+      .app-header > div:last-child { gap: 10px; }
+
+      .role-nav button {
+        flex: 1 1 0;
+        min-height: 44px;
+        font-size: 13px;
+      }
+
+      .workspace-content {
+        min-height: 72vh;
+        padding: 32px;
+      }
+
+      .workspace-content label {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 13px !important;
+      }
+
+      .workspace-content .control {
+        min-height: 42px;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .workspace-content .table-wrap {
+        max-height: min(55vh, 560px) !important;
+      }
+
+      [data-view="admin"]:not(.hidden) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+      [data-view="admin"] > * { min-width: 0; margin-top: 0 !important; }
+      [data-view="admin"] > div:first-child,
+      [data-view="admin"] > .table-wrap,
+      [data-view="admin"] > section:last-child { grid-column: 1 / -1; }
+      [data-view="admin"] .table-wrap { max-height: min(48vh, 520px) !important; }
+
+      [data-view="conductor"]:not(.hidden) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 16px; }
+      [data-view="conductor"] > * { min-width: 0; margin-top: 0 !important; }
+      [data-view="conductor"] > div:first-child,
+      [data-view="conductor"] > .scan-workflow,
+      [data-view="conductor"] > div:last-child { grid-column: 1 / -1; }
+      .scan-workflow { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(220px, 1fr); align-items: center; gap: 12px; padding: 14px; border: 1px solid rgba(245, 158, 11, .25); border-radius: 18px; background: rgba(10, 16, 15, .56); }
+      .scan-workflow > div:first-child { grid-row: span 2; }
+
+      .workspace-content h2 { font-size: 1.55rem; }
+      .workspace-content h3 { font-size: 1rem; }
+
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 10px; }
+
+      .app-header { flex-wrap: wrap; }
+      .app-header > div:nth-child(2) { order: 3; }
+      .app-header > div:last-child { margin-left: auto; }
+
+      .workspace-content {
+        min-height: 0;
+        padding: 16px;
+      }
+
+      .role-nav button {
+        flex: 0 0 auto;
+      }
+
+      [data-view="admin"]:not(.hidden) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      [data-view="admin"] > * { grid-column: 1 / -1; }
+      [data-view="admin"] > section { padding: 13px; }
+      [data-view="admin"] .table-wrap { max-height: 52vh !important; }
+      [data-view="conductor"]:not(.hidden) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      [data-view="conductor"] > * { grid-column: 1 / -1; }
+      .scan-workflow { grid-template-columns: minmax(0, 1fr); }
+      .scan-workflow > div:first-child { grid-row: auto; }
+
+      table {
+        min-width: 560px;
+      }
+
+      .control { font-size: 16px; }
+    }
+
+    /* =====================================================================
+       CAPA FUTURISTA · AvoChain "Neo-Grove"
+       Solo estilos: no cambia IDs, clases usadas por JS ni la lógica.
+       ===================================================================== */
+    :root {
+      --neon: #b6ff3b;
+      --neon-2: #22e3c4;
+      --neon-3: #7c5cff;
+      --ink: #050b09;
+      --glass: rgba(10, 20, 17, .62);
+      --glass-strong: rgba(8, 16, 14, .82);
+      --line: rgba(182, 255, 59, .16);
+      --glow: 0 0 0 1px rgba(182,255,59,.18), 0 0 28px rgba(182,255,59,.12);
+      --font-display: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    html[data-theme="light"] {
+      --neon: #4d9a0f;
+      --neon-2: #0b9c86;
+      --neon-3: #6a4be0;
+      --glass: rgba(255, 255, 255, .72);
+      --glass-strong: rgba(255, 255, 255, .92);
+      --line: rgba(77, 154, 15, .22);
+      --glow: 0 0 0 1px rgba(77,154,15,.16), 0 10px 30px rgba(77,154,15,.1);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-display); letter-spacing: -.005em; position: relative; isolation: isolate; }
+
+    /* Fondo: aurora animada + rejilla con desvanecido */
+    body {
+      background-color: #040a08;
+      background-image:
+        radial-gradient(60rem 40rem at 8% -10%, rgba(182,255,59,.16), transparent 60%),
+        radial-gradient(50rem 36rem at 100% 0%, rgba(34,227,196,.13), transparent 60%),
+        radial-gradient(46rem 40rem at 50% 120%, rgba(124,92,255,.14), transparent 60%);
+    }
+    body::before, body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1; }
+    body::before {
+      background-image:
+        linear-gradient(rgba(182,255,59,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(182,255,59,.055) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 20%, transparent 78%);
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 20%, transparent 78%);
+      animation: gridDrift 28s linear infinite;
+    }
+    body::after {
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);
+      mix-blend-mode: overlay;
+    }
+    html[data-theme="light"] body { background-color: #f1f7f3; }
+    html[data-theme="light"] body::before {
+      background-image:
+        linear-gradient(rgba(77,154,15,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(77,154,15,.07) 1px, transparent 1px);
+    }
+    html[data-theme="light"] body::after { display: none; }
+    @keyframes gridDrift { to { background-position: 44px 44px, 44px 44px; } }
+
+    /* Scrollbars */
+    * { scrollbar-width: thin; scrollbar-color: rgba(182,255,59,.35) transparent; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--neon), var(--neon-2)); border-radius: 99px; opacity: .6; }
+    ::selection { background: rgba(182,255,59,.3); }
+
+    /* Paneles de vidrio con borde degradado */
+    .panel:not(.role-nav) { position: relative; }
+    .panel {
+      background: var(--glass) !important;
+      border: 1px solid transparent !important;
+      border-radius: 24px;
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      backdrop-filter: blur(22px) saturate(140%);
+      box-shadow: 0 24px 60px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.06);
+    }
+    html[data-theme="light"] .panel { box-shadow: 0 18px 44px rgba(31,52,40,.09), inset 0 1px #fff; }
+    .panel::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+      background: linear-gradient(135deg, rgba(182,255,59,.55), rgba(255,255,255,.04) 28%, rgba(255,255,255,.03) 62%, rgba(34,227,196,.5));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: .75;
+    }
+
+    /* Encabezado */
+    .app-header {
+      background: linear-gradient(110deg, rgba(14,40,30,.82), rgba(8,18,22,.7)) !important;
+      overflow: hidden;
+    }
+    .app-header::after {
+      content: ""; position: absolute; left: -30%; top: 0; width: 30%; height: 100%; pointer-events: none;
+      background: linear-gradient(100deg, transparent, rgba(182,255,59,.1), transparent);
+      animation: sweep 7s ease-in-out infinite;
+    }
+    @keyframes sweep { 0%, 55% { left: -35%; } 100% { left: 125%; } }
+    html[data-theme="light"] .app-header { background: linear-gradient(110deg, rgba(235,248,232,.92), rgba(255,255,255,.85)) !important; }
+    .app-header h1 {
+      font-weight: 800; letter-spacing: .02em; font-size: 1.1rem;
+      background: linear-gradient(90deg, var(--neon), var(--neon-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .app-header > div:first-child > div:first-child {
+      background: radial-gradient(circle at 30% 20%, rgba(182,255,59,.3), rgba(5,20,14,.9)) !important;
+      border-color: rgba(182,255,59,.6) !important;
+      box-shadow: 0 0 22px rgba(182,255,59,.35), inset 0 0 12px rgba(182,255,59,.2);
+      animation: logoPulse 3.6s ease-in-out infinite;
+    }
+    @keyframes logoPulse { 50% { box-shadow: 0 0 34px rgba(34,227,196,.5), inset 0 0 16px rgba(34,227,196,.25); } }
+    #currentUserLabel { font-family: var(--font-mono); font-size: 11px; color: var(--neon-2); }
+
+    /* Navegación por roles */
+    .role-nav {
+      background: var(--glass-strong) !important; border-radius: 20px; padding: 6px !important;
+    }
+    .role-nav button {
+      border-radius: 14px; color: #8aa39a; font-weight: 700; letter-spacing: .02em;
+      background: transparent; position: relative; overflow: hidden;
+    }
+    .role-nav button.role-active {
+      background: linear-gradient(135deg, rgba(182,255,59,.22), rgba(34,227,196,.16)) !important;
+      color: #eaffc2 !important;
+      border-color: rgba(182,255,59,.55) !important;
+      box-shadow: 0 0 22px rgba(182,255,59,.22), inset 0 1px rgba(255,255,255,.14);
+    }
+    .role-nav button.role-active::after {
+      content: ""; position: absolute; left: 20%; right: 20%; bottom: 0; height: 2px; border-radius: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon), transparent); box-shadow: 0 0 10px var(--neon);
+    }
+    html[data-theme="light"] .role-nav button { color: #5b6b62; }
+    html[data-theme="light"] .role-nav button.role-active { color: #2c5a0c !important; }
+
+    /* Área de trabajo */
+    .workspace-content {
+      background: linear-gradient(160deg, rgba(8,18,15,.55), rgba(8,14,18,.45)) !important;
+      border-radius: 24px;
+    }
+    html[data-theme="light"] .workspace-content { background: linear-gradient(160deg, rgba(255,255,255,.7), rgba(241,247,244,.6)) !important; }
+    .role-view { animation: viewIn .5s cubic-bezier(.2,.8,.2,1) both; }
+    .role-view > * { animation: viewIn .55s cubic-bezier(.2,.8,.2,1) both; }
+    .role-view > *:nth-child(2) { animation-delay: .05s; }
+    .role-view > *:nth-child(3) { animation-delay: .1s; }
+    .role-view > *:nth-child(4) { animation-delay: .15s; }
+    .role-view > *:nth-child(5) { animation-delay: .2s; }
+    .role-view > *:nth-child(n+6) { animation-delay: .25s; }
+    @keyframes viewIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    /* Cabecera de cada módulo (HU-xx) */
+    .workspace-content .role-view > div:first-child {
+      background: linear-gradient(115deg, rgba(182,255,59,.1), rgba(34,227,196,.06) 60%, rgba(124,92,255,.07)) !important;
+      border: 1px solid var(--line) !important; border-radius: 20px;
+    }
+    .workspace-content .role-view > div:first-child > p:first-child {
+      display: inline-block; font-family: var(--font-mono); padding: 3px 10px; border-radius: 99px;
+      background: rgba(182,255,59,.08); border: 1px solid var(--line);
+    }
+    .workspace-content .role-view > div:first-child h2 {
+      font-weight: 800; letter-spacing: -.03em;
+      background: linear-gradient(90deg, #fff, #cfffe6 55%, var(--neon-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    html[data-theme="light"] .workspace-content .role-view > div:first-child h2 {
+      background: linear-gradient(90deg, #17301f, #2c6a22 60%, var(--neon-2));
+      -webkit-background-clip: text; background-clip: text;
+    }
+
+    /* Tarjetas internas */
+    .role-view section[class*="rounded-xl"], .role-view div[class*="rounded-xl"][class*="border"], .premium-panel > article {
+      border-radius: 18px !important;
+      transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+    }
+    .role-view section[class*="rounded-xl"]:hover, .role-view div[class*="rounded-xl"][class*="border-"]:hover {
+      box-shadow: var(--glow), 0 14px 36px rgba(0,0,0,.2);
+    }
+    .role-view h3 { letter-spacing: .01em; }
+
+    /* Inputs */
+    .control {
+      background: rgba(5,12,10,.7) !important; border: 1px solid rgba(148,163,184,.22) !important;
+      border-radius: 12px !important; font-family: var(--font-display);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
+    }
+    .control:hover { border-color: rgba(182,255,59,.35) !important; }
+    .control:focus {
+      border-color: var(--neon) !important;
+      box-shadow: 0 0 0 3px rgba(182,255,59,.16), 0 0 22px rgba(182,255,59,.16) !important;
+      background: rgba(6,16,12,.9) !important;
+    }
+    html[data-theme="light"] .control { background: rgba(255,255,255,.9) !important; border-color: #c5d6cb !important; box-shadow: inset 0 1px 2px rgba(31,52,40,.06); }
+    html[data-theme="light"] .control:focus { background: #fff !important; }
+    select.control { appearance: none; -webkit-appearance: none; padding-right: 34px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23b6ff3b' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important; background-position: right 12px center !important; }
+    input[type="file"].control { padding: 8px; }
+    input[type="file"]::file-selector-button {
+      margin-right: 10px; border: 0; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-weight: 700;
+      background: linear-gradient(135deg, var(--neon), var(--neon-2)); color: #07210f;
+    }
+    input[type="checkbox"], input[type="radio"] { accent-color: var(--neon); }
+    .role-view label, .workspace-content label { font-family: var(--font-mono); font-size: 10.5px !important; letter-spacing: .06em; text-transform: uppercase; color: #8fb3a5 !important; }
+    html[data-theme="light"] .role-view label, html[data-theme="light"] .workspace-content label { color: #4b6a5a !important; }
+    #pagoDemoModal label, #solicitudScreen label, #loginScreen label { text-transform: none; letter-spacing: 0; font-family: var(--font-display); }
+
+    /* Botones */
+    .btn { position: relative; overflow: hidden; border-radius: 13px; letter-spacing: .02em; }
+    .btn::after {
+      content: ""; position: absolute; top: 0; left: -70%; width: 50%; height: 100%; pointer-events: none;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent);
+      transform: skewX(-20deg); transition: left .6s ease;
+    }
+    .btn:not(:disabled):hover::after { left: 130%; }
+    .btn:not(:disabled):active { transform: translateY(0) scale(.98); }
+    .btn-primary {
+      background: linear-gradient(135deg, #d4ff5e, var(--neon) 40%, var(--neon-2)) !important;
+      color: #06210f !important;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.18) inset, 0 8px 26px rgba(120,230,60,.3), 0 0 30px rgba(34,227,196,.15);
+    }
+    .btn-primary:not(:disabled):hover { box-shadow: 0 0 0 1px rgba(255,255,255,.3) inset, 0 10px 34px rgba(120,230,60,.45), 0 0 44px rgba(34,227,196,.3); }
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(182,255,59,.1), rgba(34,227,196,.07)) !important;
+      color: #d4ffa0 !important; border: 1px solid rgba(182,255,59,.32) !important;
+      backdrop-filter: blur(6px);
+    }
+    .btn-secondary:not(:disabled):hover { border-color: var(--neon) !important; box-shadow: 0 0 22px rgba(182,255,59,.22); }
+    .btn-danger { background: linear-gradient(135deg, rgba(255,60,100,.16), rgba(255,60,100,.07)) !important; border-color: rgba(255,90,120,.55) !important; }
+    .btn-danger:not(:disabled):hover { box-shadow: 0 0 24px rgba(255,60,100,.3); }
+    html[data-theme="light"] .btn-primary { color: #0d2c12 !important; }
+    html[data-theme="light"] .btn-secondary { color: #2c5a0c !important; background: linear-gradient(135deg, #eaf6e0, #e6f6f1) !important; border-color: #a9d28a !important; }
+    html[data-theme="light"] .btn-danger { color: #a5243b !important; background: #fff0f2 !important; }
+
+    /* Insignias y estados */
+    .badge { font-family: var(--font-mono); letter-spacing: .06em; font-size: 10.5px; border: 1px solid currentColor; box-shadow: 0 0 14px -2px currentColor; }
+
+    /* Tablas */
+    .table-wrap { border-radius: 16px; border: 1px solid var(--line) !important; background: rgba(4,10,8,.4); }
+    html[data-theme="light"] .table-wrap { background: rgba(255,255,255,.6); }
+    th { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; color: var(--neon-2) !important; background: rgba(6,16,13,.9) !important; position: sticky; top: 0; z-index: 1; }
+    html[data-theme="light"] th { background: #eaf3ee !important; color: #1a7a68 !important; }
+    tbody tr { transition: background .18s ease; }
+    tbody tr:hover { background: rgba(182,255,59,.06); }
+    td { border-color: rgba(148,163,184,.14); }
+    td.font-mono, .font-mono { font-family: var(--font-mono) !important; }
+
+    /* Zona QR / escáner con línea láser */
+    #qrBox, .scan-workflow > div:first-child {
+      position: relative; border-color: rgba(182,255,59,.35) !important;
+      background:
+        linear-gradient(var(--neon), var(--neon)) top left / 18px 2px no-repeat,
+        linear-gradient(var(--neon), var(--neon)) top left / 2px 18px no-repeat,
+        linear-gradient(var(--neon), var(--neon)) top right / 18px 2px no-repeat,
+        linear-gradient(var(--neon), var(--neon)) top right / 2px 18px no-repeat,
+        linear-gradient(var(--neon), var(--neon)) bottom left / 18px 2px no-repeat,
+        linear-gradient(var(--neon), var(--neon)) bottom left / 2px 18px no-repeat,
+        linear-gradient(var(--neon), var(--neon)) bottom right / 18px 2px no-repeat,
+        linear-gradient(var(--neon), var(--neon)) bottom right / 2px 18px no-repeat,
+        rgba(2,8,6,.55) !important;
+      border-style: solid !important; border-width: 1px !important; border-radius: 16px !important; overflow: hidden;
+    }
+    .scan-workflow > div:first-child::after {
+      content: ""; position: absolute; left: 6%; right: 6%; height: 2px; top: 10%; pointer-events: none;
+      background: linear-gradient(90deg, transparent, var(--neon-2), transparent);
+      box-shadow: 0 0 14px var(--neon-2); animation: laser 2.8s ease-in-out infinite alternate;
+    }
+    @keyframes laser { to { top: 88%; } }
+    #qrBox img { box-shadow: 0 0 40px rgba(182,255,59,.35); }
+
+    /* Panel premium */
+    .premium-panel {
+      background: linear-gradient(120deg, rgba(60,50,10,.35), rgba(10,26,20,.7) 45%, rgba(14,20,34,.6)) !important;
+    }
+    .premium-panel::before { background: linear-gradient(135deg, rgba(255,196,60,.65), rgba(255,255,255,.04) 30%, rgba(182,255,59,.45)); }
+    html[data-theme="light"] .premium-panel { background: linear-gradient(120deg, #fff6df, #f6fbf4 55%, #eef7f4) !important; }
+
+    /* Línea de tiempo del origen */
+    #origenResumen ol li > span.absolute { box-shadow: 0 0 10px currentColor; }
+
+    /* Login / solicitud / activar */
+    #loginScreen, #solicitudScreen, #activarCuentaScreen {
+      position: relative; background: var(--glass-strong) !important; border: 1px solid transparent !important;
+      border-radius: 28px !important; backdrop-filter: blur(24px); box-shadow: 0 30px 80px rgba(0,0,0,.5), var(--glow) !important;
+      animation: viewIn .7s cubic-bezier(.2,.8,.2,1) both;
+    }
+    #loginScreen::before, #solicitudScreen::before, #activarCuentaScreen::before {
+      content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none; z-index: 0;
+      background: conic-gradient(from var(--ang, 0deg), rgba(182,255,59,.9), rgba(34,227,196,.1) 25%, rgba(124,92,255,.7) 50%, rgba(34,227,196,.1) 75%, rgba(182,255,59,.9));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; animation: spinBorder 8s linear infinite;
+    }
+    @property --ang { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+    @keyframes spinBorder { to { --ang: 360deg; } }
+    #loginScreen h1, #solicitudScreen h1, #activarCuentaScreen h1 {
+      font-weight: 800; letter-spacing: -.03em; font-size: 1.9rem;
+      background: linear-gradient(90deg, #fff, var(--neon) 70%, var(--neon-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    html[data-theme="light"] #loginScreen h1, html[data-theme="light"] #solicitudScreen h1, html[data-theme="light"] #activarCuentaScreen h1 {
+      background: linear-gradient(90deg, #17301f, #3f8a12 70%, var(--neon-2)); -webkit-background-clip: text; background-clip: text;
+    }
+    #loginScreen > div:first-child p:first-child, #solicitudScreen > div:first-child p:first-child, #activarCuentaScreen > div:first-child p:first-child {
+      font-family: var(--font-mono); letter-spacing: .22em;
+    }
+    html[data-theme="light"] #loginScreen, html[data-theme="light"] #solicitudScreen, html[data-theme="light"] #activarCuentaScreen { background: rgba(255,255,255,.88) !important; box-shadow: 0 24px 60px rgba(31,52,40,.14), var(--glow) !important; }
+
+    /* Diálogo de pago */
+    #pagoDemoModal { border-radius: 26px !important; backdrop-filter: blur(24px); background: var(--glass-strong) !important; box-shadow: 0 40px 100px rgba(0,0,0,.6), 0 0 60px rgba(255,196,60,.12) !important; }
+    #pagoDemoModal[open] { animation: viewIn .35s cubic-bezier(.2,.8,.2,1) both; }
+    #pagoDemoModal::backdrop { background: radial-gradient(circle at 50% 40%, rgba(10,30,20,.7), rgba(0,0,0,.85)); backdrop-filter: blur(6px); }
+
+    /* Toast */
+    .app-toast {
+      border-radius: 16px; backdrop-filter: blur(18px); background: var(--glass-strong) !important;
+      font-family: var(--font-mono); font-size: 12px; border-left: 3px solid var(--neon-2);
+      animation: toastIn .4s cubic-bezier(.2,.9,.3,1.2) both;
+    }
+    .app-toast.toast-success { border-color: rgba(182,255,59,.5); border-left: 3px solid var(--neon); box-shadow: 0 0 30px rgba(182,255,59,.18); }
+    .app-toast.toast-error { border-left: 3px solid #ff4d6d; box-shadow: 0 0 30px rgba(255,77,109,.2); }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: none; } }
+
+    /* Indicador "API local" */
+    .app-header .animate-pulse { box-shadow: 0 0 12px #34d399; }
+    .theme-toggle { border-radius: 99px !important; }
+
+    /* =====================================================================
+       MODO CLARO · "Daylight Lab" (refinamiento)
+       ===================================================================== */
+    html[data-theme="light"] {
+      --neon: #3f8f0a;
+      --neon-2: #0a8f7a;
+      --line: rgba(63,143,10,.2);
+      --txt: #17261f;
+      --txt-soft: #50655a;
+    }
+    html[data-theme="light"] body {
+      color: var(--txt);
+      background-color: #eef5f0;
+      background-image:
+        radial-gradient(52rem 34rem at 6% -8%, rgba(150,220,70,.30), transparent 62%),
+        radial-gradient(46rem 32rem at 100% 0%, rgba(60,200,180,.22), transparent 62%),
+        radial-gradient(44rem 36rem at 50% 118%, rgba(150,130,255,.16), transparent 62%);
+    }
+    html[data-theme="light"] body::before {
+      background-image:
+        linear-gradient(rgba(40,110,40,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(40,110,40,.06) 1px, transparent 1px);
+    }
+
+    /* Paneles: vidrio blanco con sombra suave y borde luminoso fino */
+    html[data-theme="light"] .panel {
+      background: rgba(255,255,255,.74) !important;
+      box-shadow: 0 1px 0 #fff inset, 0 18px 44px -12px rgba(30,70,45,.18), 0 2px 6px rgba(30,70,45,.05);
+    }
+    html[data-theme="light"] .panel::before {
+      background: linear-gradient(135deg, rgba(110,190,40,.65), rgba(255,255,255,.5) 30%, rgba(255,255,255,.4) 62%, rgba(20,180,160,.55));
+      opacity: .9;
+    }
+    html[data-theme="light"] .app-header {
+      background: linear-gradient(110deg, rgba(232,247,226,.95), rgba(255,255,255,.9) 55%, rgba(230,246,244,.92)) !important;
+    }
+    html[data-theme="light"] .app-header::after { background: linear-gradient(100deg, transparent, rgba(110,200,40,.18), transparent); }
+    html[data-theme="light"] .app-header h1 {
+      background: linear-gradient(90deg, #2f7a08, #0a8f7a); -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    html[data-theme="light"] .app-header > div:first-child > div:first-child {
+      background: radial-gradient(circle at 30% 20%, #f4ffe0, #d4f2b0) !important;
+      border-color: rgba(63,143,10,.5) !important; color: #2f7a08 !important;
+      box-shadow: 0 6px 18px rgba(80,170,30,.28), inset 0 1px #fff;
+      animation: none;
+    }
+    html[data-theme="light"] #currentUserLabel { color: #0a7a68; }
+    html[data-theme="light"] .app-header > div:nth-child(2) { background: #fff !important; border-color: #cfe0d4 !important; color: #3a4f44 !important; }
+
+    /* Navegación */
+    html[data-theme="light"] .role-nav { background: rgba(255,255,255,.88) !important; }
+    html[data-theme="light"] .role-nav button:not(.role-active):not(:disabled):hover { background: rgba(120,200,60,.12); color: #2c5a0c; border-color: rgba(63,143,10,.25); }
+    html[data-theme="light"] .role-nav button.role-active {
+      background: linear-gradient(135deg, #e3f7cf, #d8f4ee) !important;
+      color: #1f5a08 !important; border-color: rgba(63,143,10,.5) !important;
+      box-shadow: 0 6px 18px rgba(80,170,30,.22), inset 0 1px #fff;
+    }
+    html[data-theme="light"] .role-nav button.role-active::after { background: linear-gradient(90deg, transparent, #3f8f0a, transparent); box-shadow: 0 0 8px rgba(63,143,10,.6); }
+
+    /* Área de trabajo y cabeceras de módulo */
+    html[data-theme="light"] .workspace-content { background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(236,246,240,.5)) !important; }
+    html[data-theme="light"] .workspace-content .role-view > div:first-child {
+      background: linear-gradient(115deg, rgba(190,235,140,.38), rgba(170,235,225,.28) 60%, rgba(200,190,255,.25)) !important;
+      border-color: rgba(63,143,10,.22) !important; box-shadow: inset 0 1px #fff, 0 8px 24px -10px rgba(40,100,50,.2);
+    }
+    html[data-theme="light"] .workspace-content .role-view > div:first-child > p:first-child {
+      background: rgba(255,255,255,.75); border-color: rgba(63,143,10,.28);
+    }
+    html[data-theme="light"] .workspace-content .role-view > div:first-child h2 {
+      background: linear-gradient(90deg, #142a1c, #2c6e12 60%, #0a8f7a); -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    html[data-theme="light"] .workspace-content .role-view > div:first-child > p:nth-child(3) { color: var(--txt-soft); }
+
+    /* Tarjetas internas (traducen los fondos translúcidos oscuros) */
+    html[data-theme="light"] .role-view section[class*="rounded-xl"],
+    html[data-theme="light"] .role-view div[class*="rounded-xl"][class*="border-"] {
+      background-color: rgba(255,255,255,.7) !important;
+      box-shadow: 0 8px 22px -10px rgba(30,70,45,.2), inset 0 1px #fff;
+    }
+    html[data-theme="light"] .role-view section[class*="rounded-xl"]:hover,
+    html[data-theme="light"] .role-view div[class*="rounded-xl"][class*="border-"]:hover {
+      box-shadow: 0 0 0 1px rgba(63,143,10,.25), 0 14px 32px -10px rgba(30,70,45,.28);
+    }
+    html[data-theme="light"] .premium-panel > article { background: rgba(255,255,255,.7) !important; border-color: #d9e6dd !important; }
+    html[data-theme="light"] .bg-black\/30 { background-color: #f1f6f3 !important; }
+    html[data-theme="light"] [class*="bg-black/"] { background-color: rgba(235,243,238,.85) !important; }
+    html[data-theme="light"] .border-slate-700\/50 { border-color: #d6e1da !important; }
+
+    /* Texto: mapeo de tonos neón a versiones legibles sobre fondo claro */
+    html[data-theme="light"] .text-sky-200, html[data-theme="light"] .text-sky-300 { color: #0b6a96 !important; }
+    html[data-theme="light"] .text-rose-200, html[data-theme="light"] .text-rose-300 { color: #b0243d !important; }
+    html[data-theme="light"] .text-yellow-200, html[data-theme="light"] .text-yellow-300 { color: #8a6208 !important; }
+    html[data-theme="light"] .text-slate-600 { color: #6b7d72 !important; }
+    html[data-theme="light"] .text-lime-100 { color: #2c5a0c !important; }
+    html[data-theme="light"] .text-emerald-100, html[data-theme="light"] .text-amber-100 { color: #1c4f3a !important; }
+    html[data-theme="light"] .text-amber-100 { color: #6d4a06 !important; }
+    html[data-theme="light"] .text-cyan-300 { color: #0a6b78 !important; }
+    html[data-theme="light"] a.text-cyan-300, html[data-theme="light"] .underline { text-decoration-color: rgba(10,107,120,.4); }
+    html[data-theme="light"] .role-view label, html[data-theme="light"] .workspace-content label { color: #496355 !important; }
+    html[data-theme="light"] .text-slate-400 { color: #5d7266 !important; }
+    html[data-theme="light"] .text-slate-500 { color: #7a8c81 !important; }
+    html[data-theme="light"] .badge.bg-lime-500\/20, html[data-theme="light"] .badge.bg-lime-500\/10 { background-color: rgba(120,200,50,.18) !important; color: #2c6e08 !important; }
+    html[data-theme="light"] .badge.bg-sky-500\/20 { background-color: rgba(60,160,230,.16) !important; color: #0b5f8a !important; }
+    html[data-theme="light"] .badge.bg-cyan-500\/10 { background-color: rgba(30,190,200,.14) !important; color: #0a6b78 !important; }
+    html[data-theme="light"] .badge.bg-violet-500\/10 { background-color: rgba(130,100,240,.14) !important; color: #5d3fb8 !important; }
+    html[data-theme="light"] .badge { box-shadow: none; }
+
+    /* Campos */
+    html[data-theme="light"] .control {
+      background: #fff !important; border-color: #c7d8cd !important; color: var(--txt) !important;
+      box-shadow: inset 0 1px 2px rgba(30,70,45,.06), 0 1px 0 #fff;
+    }
+    html[data-theme="light"] .control:hover { border-color: rgba(63,143,10,.5) !important; }
+    html[data-theme="light"] .control:focus {
+      border-color: #3f8f0a !important; box-shadow: 0 0 0 4px rgba(90,180,40,.18), 0 6px 18px rgba(80,170,30,.14) !important;
+    }
+    html[data-theme="light"] select.control {
+      background-color: #fff !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%233f8f0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      background-size: 12px 8px !important;
+      padding-right: 34px !important;
+      color-scheme: light;
+    }
+    html[data-theme="light"] select.control option { background: #fff; color: var(--txt); }
+    html[data-theme="light"] input[type="file"]::file-selector-button { background: linear-gradient(135deg, #7fd13a, #1fbf9f); color: #06260f; }
+
+    /* Botones */
+    html[data-theme="light"] .btn-primary {
+      background: linear-gradient(135deg, #8ee03f, #4fb82a 45%, #17b59a) !important; color: #05240e !important;
+      box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 8px 22px rgba(70,170,40,.32);
+    }
+    html[data-theme="light"] .btn-primary:not(:disabled):hover { box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 12px 30px rgba(70,170,40,.42); }
+    html[data-theme="light"] .btn-secondary {
+      background: linear-gradient(135deg, #f1faea, #e8f7f3) !important; color: #25590c !important; border-color: #b4d99a !important;
+      box-shadow: 0 1px 0 #fff inset, 0 2px 8px rgba(30,70,45,.06);
+    }
+    html[data-theme="light"] .btn-secondary:not(:disabled):hover { border-color: #3f8f0a !important; box-shadow: 0 6px 18px rgba(80,170,30,.2); }
+    html[data-theme="light"] .btn-danger {
+      background: linear-gradient(135deg, #fff1f3, #ffe8ec) !important; color: #a5243b !important; border-color: #f0a9b6 !important;
+    }
+    html[data-theme="light"] .btn-danger:not(:disabled):hover { box-shadow: 0 6px 18px rgba(220,60,90,.2); }
+    html[data-theme="light"] .btn::after { background: linear-gradient(100deg, transparent, rgba(255,255,255,.7), transparent); }
+
+    /* Tablas */
+    html[data-theme="light"] .table-wrap { background: rgba(255,255,255,.8); border-color: #d3e1d8 !important; box-shadow: 0 8px 22px -12px rgba(30,70,45,.2); }
+    html[data-theme="light"] th { background: #e9f3ec !important; color: #0e7563 !important; }
+    html[data-theme="light"] td { color: #22352b; border-color: #e1ebe5; }
+    html[data-theme="light"] tbody tr:hover { background: rgba(120,200,60,.09); }
+
+    /* Escáner y QR */
+    html[data-theme="light"] #qrBox, html[data-theme="light"] .scan-workflow > div:first-child {
+      border-color: rgba(63,143,10,.4) !important;
+      background:
+        linear-gradient(#3f8f0a, #3f8f0a) top left / 18px 2px no-repeat,
+        linear-gradient(#3f8f0a, #3f8f0a) top left / 2px 18px no-repeat,
+        linear-gradient(#3f8f0a, #3f8f0a) top right / 18px 2px no-repeat,
+        linear-gradient(#3f8f0a, #3f8f0a) top right / 2px 18px no-repeat,
+        linear-gradient(#3f8f0a, #3f8f0a) bottom left / 18px 2px no-repeat,
+        linear-gradient(#3f8f0a, #3f8f0a) bottom left / 2px 18px no-repeat,
+        linear-gradient(#3f8f0a, #3f8f0a) bottom right / 18px 2px no-repeat,
+        linear-gradient(#3f8f0a, #3f8f0a) bottom right / 2px 18px no-repeat,
+        linear-gradient(160deg, #f6fbf7, #eaf4ef) !important;
+    }
+    html[data-theme="light"] .scan-workflow { background: rgba(255,255,255,.65) !important; border-color: rgba(200,140,20,.3) !important; }
+    html[data-theme="light"] .scan-workflow > div:first-child::after { background: linear-gradient(90deg, transparent, #0a8f7a, transparent); box-shadow: 0 0 10px rgba(10,143,122,.6); }
+    html[data-theme="light"] #qrBox img { box-shadow: 0 10px 28px rgba(30,70,45,.25); border: 1px solid #d3e1d8; }
+
+    /* Premium */
+    html[data-theme="light"] .premium-panel { background: linear-gradient(120deg, #fff4d6, #f7fbf2 48%, #edf7f4) !important; }
+    html[data-theme="light"] .premium-panel::before { background: linear-gradient(135deg, rgba(235,170,30,.7), rgba(255,255,255,.5) 30%, rgba(90,180,50,.55)); }
+    html[data-theme="light"] .premium-panel .text-amber-200, html[data-theme="light"] .premium-panel .text-amber-300 { color: #9a6208 !important; }
+
+    /* Login, solicitud y activar */
+    html[data-theme="light"] #loginScreen, html[data-theme="light"] #solicitudScreen, html[data-theme="light"] #activarCuentaScreen {
+      background: rgba(255,255,255,.9) !important;
+      box-shadow: 0 30px 70px -20px rgba(30,70,45,.28), 0 2px 8px rgba(30,70,45,.06) !important;
+    }
+    html[data-theme="light"] #loginScreen::before, html[data-theme="light"] #solicitudScreen::before, html[data-theme="light"] #activarCuentaScreen::before {
+      background: conic-gradient(from var(--ang, 0deg), rgba(63,170,20,.9), rgba(20,180,160,.15) 25%, rgba(130,100,240,.7) 50%, rgba(20,180,160,.15) 75%, rgba(63,170,20,.9));
+    }
+    html[data-theme="light"] #loginScreen h1, html[data-theme="light"] #solicitudScreen h1, html[data-theme="light"] #activarCuentaScreen h1 {
+      background: linear-gradient(90deg, #142a1c, #2f7a08 65%, #0a8f7a); -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    html[data-theme="light"] #loginScreen .text-lime-300, html[data-theme="light"] #solicitudScreen .text-lime-300, html[data-theme="light"] #activarCuentaScreen .text-lime-300 { color: #3f8f0a !important; }
+
+    /* Diálogo de pago y toast */
+    html[data-theme="light"] #pagoDemoModal { background: #fff !important; box-shadow: 0 40px 90px -20px rgba(30,70,45,.4), 0 0 0 1px rgba(63,143,10,.15) !important; }
+    html[data-theme="light"] #pagoDemoModal::backdrop { background: radial-gradient(circle at 50% 40%, rgba(220,240,225,.7), rgba(40,60,50,.55)); }
+    html[data-theme="light"] #pagoDemoModal .border-slate-800, html[data-theme="light"] #pagoDemoModal .border-slate-700 { border-color: #d6e1da !important; }
+    html[data-theme="light"] #pagoDemoModal label:has(input:checked) { background: rgba(120,200,60,.14) !important; border-color: #3f8f0a !important; }
+    html[data-theme="light"] .app-toast { background: rgba(255,255,255,.95) !important; color: #1f3329; border-left-color: #0a8f7a; box-shadow: 0 16px 40px -12px rgba(30,70,45,.35); }
+    html[data-theme="light"] .app-toast.toast-success { border-left-color: #3f8f0a; box-shadow: 0 16px 40px -12px rgba(63,143,10,.35); }
+    html[data-theme="light"] .app-toast.toast-error { border-left-color: #d93a57; color: #9f2437; box-shadow: 0 16px 40px -12px rgba(217,58,87,.3); }
+
+    /* Barras de desplazamiento y selección */
+    html[data-theme="light"] * { scrollbar-color: rgba(63,143,10,.45) transparent; }
+    html[data-theme="light"] ::selection { background: rgba(120,200,60,.35); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+  <section id="loginScreen" class="relative mx-auto mt-10 max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-xl">
+    <div class="mb-5 flex items-start justify-between gap-3">
+      <div><p class="text-xs font-bold uppercase tracking-widest text-lime-300">AvoChain · Acceso seguro</p><p class="mt-1 text-xs text-slate-400">Trazabilidad agrícola</p></div>
+      <button class="btn btn-secondary theme-toggle !min-h-9 !px-3 !py-2" type="button" data-theme-toggle></button>
+    </div>
+    <div class="mt-3 flex flex-wrap gap-2 text-[10px]" style="font-family: var(--font-mono)">
+      <span class="badge bg-lime-500/10 text-lime-300">● TRAZABILIDAD</span>
+      <span class="badge bg-cyan-500/10 text-cyan-300">● BLOCKCHAIN</span>
+      <span class="badge bg-violet-500/10 text-violet-300">● QR + GPS</span>
+    </div>
+    <h1 class="mt-3 text-2xl font-extrabold">Iniciar sesión</h1>
+    <p class="mt-1 text-sm text-slate-400">Solicita vinculación; cuando sea aprobada recibirás un enlace para activar tu cuenta.</p>
+    <form id="loginForm" class="mt-5 space-y-3">
+      <div><label for="loginEmail" class="text-xs text-slate-300">Correo</label><input id="loginEmail" class="control mt-1" type="email" autocomplete="username" required /></div>
+      <div><label for="loginPassword" class="text-xs text-slate-300">Contraseña</label><input id="loginPassword" class="control mt-1" type="password" autocomplete="current-password" required /></div>
+      <button class="btn btn-primary w-full" type="submit">Entrar</button>
+      <p id="loginError" class="hidden text-sm text-rose-300" role="alert"></p>
+    </form>
+    <button id="abrirSolicitud" class="btn btn-secondary mt-3 w-full">Solicitar vinculación</button>
+  </section>
+  <section id="solicitudScreen" class="hidden mx-auto mt-8 max-w-2xl rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-xl">
+    <div class="mb-5 flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-widest text-lime-300">AvoChain · Vinculación</p><p class="mt-1 text-xs text-slate-400">Trazabilidad agrícola</p></div><button class="btn btn-secondary theme-toggle !min-h-9 !px-3 !py-2" type="button" data-theme-toggle></button></div>
+    <h1 class="mt-2 text-2xl font-extrabold">Solicitud de acceso</h1>
+    <p class="mt-1 text-sm text-slate-400">Completa tus datos y adjunta los soportes. La cuenta se crea después de la aprobación.</p>
+    <a class="mt-3 inline-block text-sm text-lime-300 underline" href="/documentos/formulario-vinculacion-avochain.pdf" target="_blank" rel="noopener">Descargar formulario PDF de vinculación</a>
+    <form id="solicitudForm" class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <input class="control" name="nombre" placeholder="Nombre completo" required maxlength="100" />
+      <input class="control" name="email" type="email" placeholder="Correo" required />
+      <input class="control" name="documentoIdentidad" placeholder="Documento de identidad" required />
+      <input class="control" name="telefono" placeholder="Teléfono" />
+      <input class="control" name="municipio" placeholder="Municipio" />
+      <select class="control" name="rol" required><option value="">Rol solicitado</option><option>Productor</option><option>Inspector de calidad</option><option>Bodeguero</option><option>Transportador</option><option>Receptor</option><option>Vendedor</option></select>
+      <input class="control sm:col-span-2" name="finca" placeholder="Finca o empresa (si aplica)" />
+      <textarea class="control sm:col-span-2" name="motivo" placeholder="Motivo de la solicitud" rows="2"></textarea>
+      <label class="sm:col-span-2 text-xs text-slate-300">Documentos de soporte (1 a 3 archivos PDF, JPG o PNG; máximo 2 MB cada uno)<input id="solicitudArchivos" class="control mt-1" type="file" accept="application/pdf,image/jpeg,image/png" multiple required /></label>
+      <label class="sm:col-span-2 flex gap-2 text-xs text-slate-300"><input name="aceptaTratamiento" type="checkbox" required />Acepto el tratamiento de mis datos para revisar esta solicitud.</label>
+      <p id="solicitudError" class="hidden sm:col-span-2 text-sm text-rose-300" role="alert"></p>
+      <button class="btn btn-primary sm:col-span-2" type="submit">Enviar solicitud</button>
+      <button id="cancelarSolicitud" class="btn btn-secondary sm:col-span-2" type="button">Volver al inicio de sesión</button>
+    </form>
+  </section>
+  <section id="activarCuentaScreen" class="hidden mx-auto mt-10 max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-xl">
+    <div class="mb-5 flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-widest text-lime-300">AvoChain · Cuenta aprobada</p><p class="mt-1 text-xs text-slate-400">Trazabilidad agrícola</p></div><button class="btn btn-secondary theme-toggle !min-h-9 !px-3 !py-2" type="button" data-theme-toggle></button></div>
+    <h1 class="mt-2 text-2xl font-extrabold">Activa tu cuenta</h1><p class="mt-1 text-sm text-slate-400">Crea una contraseña de al menos 10 caracteres.</p>
+    <form id="activarCuentaForm" class="mt-5 space-y-3"><input id="activarPassword" type="password" class="control" minlength="10" autocomplete="new-password" placeholder="Nueva contraseña" required /><input id="activarPassword2" type="password" class="control" minlength="10" autocomplete="new-password" placeholder="Repite la contraseña" required /><p id="activarError" class="hidden text-sm text-rose-300" role="alert"></p><button class="btn btn-primary w-full">Crear cuenta</button></form>
+  </section>
+  <main id="appShell" class="app-main hidden">
+    
+    <!-- HEADER -->
+    <header class="app-header panel w-full flex items-center justify-between p-3">
+      <div class="flex items-center gap-2.5">
+        <div class="grid h-9 w-9 place-items-center rounded-lg border border-lime-500/40 bg-green-950 text-lime-300">
+          <i data-lucide="sprout" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold leading-tight">AvoChain</h1>
+          <p class="text-[10px] text-slate-400">Trazabilidad Demo</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 rounded-full border border-slate-700 bg-black/25 px-2.5 py-1 text-[10px] text-slate-300">
+        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        API local
+      </div>
+      <div class="flex items-center gap-2 text-xs"><span id="currentUserLabel" class="text-slate-300"></span><button class="btn btn-secondary theme-toggle !px-3" type="button" data-theme-toggle></button><button id="logoutButton" class="btn btn-secondary !px-3">Salir</button></div>
+    </header>
+
+    <!-- CUENTA Y FUNCIONES PREMIUM -->
+    <section class="premium-panel panel w-full p-4 md:p-5 border-amber-500/30" aria-labelledby="premiumTitle">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-widest text-amber-300">Plan AvoChain</p>
+          <h2 id="premiumTitle" class="text-lg font-extrabold">Beta gratuita y funciones Premium</h2>
+          <p id="premiumAccessInfo" class="mt-1 text-xs text-slate-400">Escribe tu correo para consultar el acceso.</p>
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+            <span id="planBadge" class="badge bg-slate-800 text-slate-300">Sin consultar</span>
+            <p id="planActionInfo" class="text-[11px] text-slate-400">Consulta tu plan para ver las opciones disponibles.</p>
+          </div>
+        </div>
+        <div class="flex w-full flex-col gap-2 sm:flex-row lg:max-w-2xl">
+              <input id="premiumEmail" type="email" class="control min-w-0 flex-1" autocomplete="email" placeholder="tu-correo@ejemplo.com" aria-label="Correo de la cuenta" readonly />
+          <button id="consultarPlan" class="btn btn-secondary">Consultar plan</button>
+          <button id="pagarPremium" class="btn btn-primary">Pagar con Wompi</button>
+          <button id="pagarPremiumDemo" class="btn btn-secondary border-amber-400/40 text-amber-200">Demostración de pago</button>
+        </div>
+      </div>
+      <article class="mt-4 rounded-xl border border-slate-700 bg-black/20 p-3">
+        <h3 class="text-xs font-bold text-amber-200">Medios disponibles en el checkout de Wompi</h3><p class="mt-1 text-[11px] text-slate-400">Tarjetas crédito/débito, PSE, Nequi y transferencia Bancolombia. Wompi mostrará los medios habilitados para la cuenta comercial.</p>
+      </article>
+      <article class="mt-4 rounded-xl border border-slate-700 bg-black/20 p-3">
+        <h3 class="text-sm font-bold">Informe de mis lotes</h3>
+        <p class="my-1 text-xs text-slate-400">Prepara el resumen de trazabilidad de tus lotes y guárdalo como PDF.</p>
+        <div class="flex flex-wrap gap-2">
+          <button id="generarReportePremium" class="btn btn-secondary" disabled>Preparar informe</button>
+          <button id="generarPdfPremium" class="btn btn-primary" disabled>Generar PDF</button>
+        </div>
+        <div id="reportePremium" class="mt-3 space-y-2 text-xs"></div>
+      </article>
+    </section>
+
+    <dialog id="pagoDemoModal" class="w-[min(94vw,28rem)] rounded-2xl border border-amber-400/40 bg-slate-950 p-0 text-slate-100 shadow-2xl backdrop:bg-black/75">
+      <div class="border-b border-slate-800 bg-gradient-to-r from-amber-950/70 to-slate-900 p-5">
+        <p class="text-[10px] font-bold uppercase tracking-[.2em] text-amber-300">AvoChain · entorno de demostración</p>
+        <h2 class="mt-2 text-xl font-extrabold">Pago del plan Premium</h2>
+        <p class="mt-1 text-sm text-slate-300">Simulación de checkout con confirmación. Usa datos ficticios: no ingreses datos reales ni se realizará un cobro.</p>
+      </div>
+      <div class="space-y-3 p-5">
+        <div class="flex items-center gap-2 text-[11px]"><span id="pagoDemoPaso1" class="rounded-full bg-lime-500/20 px-3 py-1 text-lime-200">1 · Método</span><span class="h-px flex-1 bg-slate-700"></span><span id="pagoDemoPaso2" class="rounded-full bg-slate-800 px-3 py-1 text-slate-400">2 · Confirmación</span></div>
+        <section id="pagoDemoPasoMetodo" class="space-y-3">
+          <p class="text-sm font-bold">Selecciona un medio de pago</p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-700 p-3 has-[:checked]:border-lime-400 has-[:checked]:bg-lime-500/10"><input type="radio" name="metodoPagoDemo" value="Tarjeta crédito/débito" checked /> Tarjeta crédito/débito</label>
+            <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-700 p-3 has-[:checked]:border-lime-400 has-[:checked]:bg-lime-500/10"><input type="radio" name="metodoPagoDemo" value="PSE" /> PSE</label>
+            <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-700 p-3 has-[:checked]:border-lime-400 has-[:checked]:bg-lime-500/10"><input type="radio" name="metodoPagoDemo" value="Nequi" /> Nequi</label>
+            <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-700 p-3 has-[:checked]:border-lime-400 has-[:checked]:bg-lime-500/10"><input type="radio" name="metodoPagoDemo" value="Transferencia Bancolombia" /> Bancolombia</label>
+          </div>
+          <div id="pagoDemoDatosTarjeta" class="hidden grid grid-cols-2 gap-2">
+            <label class="col-span-2 text-[11px] text-slate-300">Nombre del titular<input id="demoTitular" class="control mt-1" autocomplete="off" placeholder="NOMBRE DE PRUEBA" maxlength="60" /></label>
+            <label class="col-span-2 text-[11px] text-slate-300">Número de tarjeta ficticio<input id="demoTarjeta" class="control mt-1" inputmode="numeric" autocomplete="off" placeholder="Solo números inventados" maxlength="19" /></label>
+            <label class="text-[11px] text-slate-300">Vencimiento<input id="demoVencimiento" class="control mt-1" inputmode="numeric" autocomplete="off" placeholder="MM/AA" maxlength="5" /></label>
+            <label class="text-[11px] text-slate-300">CVC ficticio<input id="demoCvc" class="control mt-1" inputmode="numeric" autocomplete="off" placeholder="123" maxlength="4" /></label>
+          </div>
+          <div id="pagoDemoDatosNequi" class="hidden"><label class="text-[11px] text-slate-300">Número de celular Nequi (ficticio)<input id="demoNequiCelular" class="control mt-1" inputmode="numeric" autocomplete="off" placeholder="3001234567" maxlength="10" /></label></div>
+          <div id="pagoDemoDatosPse" class="hidden grid grid-cols-2 gap-2">
+            <label class="col-span-2 text-[11px] text-slate-300">Banco<select id="demoPseBanco" class="control mt-1"><option value="">Selecciona un banco</option><option>Bancolombia</option><option>Davivienda</option><option>Banco de Bogotá</option><option>BBVA</option><option>Otro banco</option></select></label>
+            <label class="text-[11px] text-slate-300">Tipo de documento<select id="demoPseTipoDocumento" class="control mt-1"><option value="CC">Cédula</option><option value="NIT">NIT</option><option value="CE">Cédula extranjería</option></select></label>
+            <label class="text-[11px] text-slate-300">Documento ficticio<input id="demoPseDocumento" class="control mt-1" inputmode="numeric" autocomplete="off" placeholder="Solo dato de prueba" maxlength="15" /></label>
+          </div>
+          <div id="pagoDemoDatosBancolombia" class="hidden"><label class="text-[11px] text-slate-300">Canal de pago<select id="demoBancolombiaCanal" class="control mt-1"><option value="">Selecciona el canal</option><option>Bancolombia App (simulada)</option><option>Transferencia de prueba</option></select></label></div>
+          <p class="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-[11px] text-amber-200">Solo para demostración: escribe datos inventados. Estos campos se validan en esta página y no se guardan ni se envían al servidor.</p>
+          <p id="pagoDemoValidacion" class="hidden text-xs text-rose-300" role="alert"></p>
+          <p id="pagoDemoAviso" class="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-xs text-amber-200"></p>
+          <div class="flex justify-end gap-2"><button id="cancelarPagoDemo" class="btn btn-secondary">Cancelar</button><button id="continuarPagoDemo" class="btn btn-primary">Continuar</button></div>
+        </div>
+        <section id="pagoDemoPasoConfirmacion" class="hidden space-y-3">
+          <p class="text-sm font-bold">Revisa y confirma tu pedido</p>
+          <div class="rounded-xl border border-slate-800 bg-black/30 p-3 text-sm">
+            <div class="flex justify-between gap-3"><span class="text-slate-400">Cuenta</span><strong id="pagoDemoCorreo" class="break-all text-right"></strong></div>
+            <div class="mt-2 flex justify-between gap-3"><span class="text-slate-400">Plan</span><strong>Premium</strong></div>
+            <div class="mt-2 flex justify-between gap-3"><span class="text-slate-400">Método</span><strong id="pagoDemoMetodo" class="text-right"></strong></div>
+            <div class="mt-2 flex justify-between gap-3 border-t border-slate-700 pt-2"><span class="text-slate-400">Total</span><strong id="pagoDemoValor" class="text-amber-200"></strong></div>
+          </div>
+          <p class="text-xs text-slate-400">Al confirmar, se registrará el resultado de la demostración y se habilitará Premium para esta cuenta. No se procesará dinero real.</p>
+          <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between"><button id="volverMetodoPagoDemo" class="btn btn-secondary">Volver</button><div class="flex gap-2"><button id="cancelarPagoDemoConfirmacion" class="btn btn-secondary">Cancelar</button><button id="confirmarPagoDemo" class="btn btn-primary">Confirmar pago</button></div></div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- ROLES NAVIGATION -->
+    <nav class="role-nav panel w-full p-1.5 flex gap-1 overflow-x-auto" aria-label="Módulos por rol">
+      <button class="btn role-active flex-1 py-1.5 px-2 text-[11px] whitespace-nowrap" data-role="productor"><i data-lucide="tractor" class="w-3.5 h-3.5"></i>Productor</button>
+      <button class="btn flex-1 py-1.5 px-2 text-[11px] whitespace-nowrap text-slate-400" data-role="calidad"><i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i>Calidad</button>
+      <button class="btn flex-1 py-1.5 px-2 text-[11px] whitespace-nowrap text-slate-400" data-role="bodega"><i data-lucide="package" class="w-3.5 h-3.5"></i>Bodega</button>
+      <button class="btn flex-1 py-1.5 px-2 text-[11px] whitespace-nowrap text-slate-400" data-role="conductor" aria-label="Conductor"><i data-lucide="truck" class="w-3.5 h-3.5"></i><span data-role-label>Conductor</span></button>
+      <button class="btn flex-1 py-1.5 px-2 text-[11px] whitespace-nowrap text-slate-400" data-role="tienda"><i data-lucide="store" class="w-3.5 h-3.5"></i>Tienda</button>
+      <button class="btn flex-1 py-1.5 px-2 text-[11px] whitespace-nowrap text-slate-400" data-role="admin" title="Administración"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i>Administración</button>
+    </nav>
+
+    <section class="workspace panel w-full" aria-label="Contenido del módulo seleccionado">
+      <div class="workspace-content bg-[#111418] space-y-4">
+        
+        <!-- PRODUCTOR -->
+        <div data-view="productor" class="role-view space-y-3">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-lime-300">HU-01, HU-02, HU-06</p>
+            <h2 class="text-lg font-extrabold">Finca, Lote y Evidencias</h2>
+            <p>Administra tus fincas y acompaña cada lote desde la cosecha hasta su trazabilidad.</p>
+          </div>
+          <section class="space-y-2 rounded-xl border border-lime-500/30 bg-lime-500/5 p-3">
+            <h3 class="text-xs font-bold text-lime-200">Mis fincas</h3>
+            <p class="text-[10px] text-slate-400">Registra tu finca. Quedará pendiente hasta que administración revise y apruebe la solicitud.</p>
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-3"><input id="productorFincaNombre" class="control" placeholder="Nombre de la finca" required /><input id="productorFincaIca" class="control" placeholder="Registro ICA" required /><input id="productorFincaGps" class="control" placeholder="GPS: latitud,longitud" required /></div>
+            <button id="solicitarFincaProductor" class="btn btn-secondary w-full">Solicitar aprobación de finca</button>
+            <div id="misFincasProductor" class="space-y-1 text-xs"><p class="text-slate-400">Cargando fincas…</p></div>
+          </section>
+          <div class="space-y-2">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label for="loteFincaId" class="text-[11px] text-slate-300">Finca ID</label>
+                <select id="loteFincaId" class="control mt-0.5" aria-label="Selecciona la finca de origen del lote"></select>
+              </div>
+              <div>
+                <label for="lotePeso" class="text-[11px] text-slate-300">Peso kg</label>
+                <input id="lotePeso" type="number" min="0.01" step="0.01" class="control mt-0.5" value="250" required />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label for="loteVariedad" class="text-[11px] text-slate-300">Variedad</label>
+                <input id="loteVariedad" class="control mt-0.5" value="Hass" maxlength="80" required />
+              </div>
+              <div>
+                <label for="loteFecha" class="text-[11px] text-slate-300">Fecha cosecha</label>
+                <input id="loteFecha" type="date" class="control mt-0.5" required />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-2 pt-1">
+              <button class="btn btn-primary w-full" id="crearLote"><i data-lucide="check-circle" class="w-4 h-4"></i>Registrar lote blockchain</button>
+              <label for="evidenciasLoteId" class="text-[11px] text-slate-300">Lote al que asociar la evidencia</label>
+              <select id="evidenciasLoteId" class="control" aria-label="Selecciona el lote para registrar evidencia"></select>
+              <label for="evidenciasFotos" class="text-[11px] text-slate-300">Fotos de evidencia (1 a 5, JPG o PNG; máximo 5 MB cada una)</label>
+              <input id="evidenciasFotos" class="control" type="file" accept="image/jpeg,image/png" multiple />
+              <p class="text-[10px] text-amber-200">Demostración: se registran el nombre y los datos del archivo con una URL IPFS simulada; la imagen no se carga a IPFS real.</p>
+              <button class="btn btn-secondary w-full" id="subirFotos"><i data-lucide="camera" class="w-3.5 h-3.5"></i>Registrar evidencia de demostración</button>
+            </div>
+          </div>
+          <section class="space-y-2 rounded-xl border border-lime-500/30 bg-lime-500/5 p-3">
+            <h3 class="text-xs font-bold text-lime-200">Mis lotes y seguimiento Premium</h3>
+            <p class="text-[10px] text-slate-400">La lista de tus lotes es gratuita. Premium abre la ficha completa de solo lectura.</p>
+            <div id="seguimientoProductor" class="space-y-1 text-xs text-slate-300">Cargando tus lotes…</div>
+            <div id="detalleProductor" class="hidden space-y-2 border-t border-lime-500/20 pt-3 text-xs text-slate-300"></div>
+          </section>
+        </div>
+
+        <!-- INSPECCIÓN DE CALIDAD -->
+        <div data-view="calidad" class="role-view hidden space-y-3">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-cyan-300">HU-11</p>
+            <h2 class="text-lg font-extrabold">Aprobar calidad del producto</h2>
+            <p class="text-[11px] text-slate-400">La aprobación habilita el QR y el despacho.</p>
+          </div>
+          <div>
+            <label for="calidadLote" class="text-[11px] text-slate-300">Lote pendiente de inspección</label>
+            <select id="calidadLote" class="control mt-0.5" aria-label="Selecciona lote para inspección de calidad"></select>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label for="calidadDestino" class="text-[11px] text-slate-300">Destino</label><select id="calidadDestino" class="control mt-0.5"><option value="Exportacion">Exportación</option><option value="Nacional">Nacional</option></select></div>
+            <div><label for="calidadFitosanitaria" class="text-[11px] text-slate-300">Evaluación fitosanitaria</label><select id="calidadFitosanitaria" class="control mt-0.5"><option value="Aprobada">Aprobada</option><option value="Rechazada">Rechazada</option></select></div>
+            <div><label for="calidadHumedad" class="text-[11px] text-slate-300">Humedad (%)</label><input id="calidadHumedad" type="number" min="0" max="100" step="0.1" class="control mt-0.5" value="65" /></div>
+            <div><label for="calidadTemperatura" class="text-[11px] text-slate-300">Temperatura (°C)</label><input id="calidadTemperatura" type="number" step="0.1" class="control mt-0.5" value="6" /></div>
+          </div>
+          <div id="calidadAlerta" class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-2 text-[11px] text-emerald-200" role="status">Parámetros dentro del rango de exportación.</div>
+          <div><label for="calidadInformeUrl" class="text-[11px] text-slate-300">URL del informe PDF (S3)</label><input id="calidadInformeUrl" type="url" class="control mt-0.5" placeholder="https://.../informe-calidad.pdf" /></div>
+          <div><label for="calidadInformeMb" class="text-[11px] text-slate-300">Peso del PDF (MB, máximo 2)</label><input id="calidadInformeMb" type="number" min="0.01" max="2" step="0.01" class="control mt-0.5" value="0.5" /></div>
+          <button class="btn btn-primary w-full" id="aprobarCalidad"><i data-lucide="shield-check" class="w-4 h-4"></i>Registrar inspección</button>
+        </div>
+
+        <!-- BODEGA -->
+        <div data-view="bodega" class="role-view hidden space-y-3">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-sky-300">HU-07, HU-08</p>
+            <h2 class="text-lg font-extrabold">QR y Despacho</h2>
+            <p>Prepara el envío, genera la identificación QR y asigna el conductor del lote.</p>
+          </div>
+          <div>
+            <label for="bodegaLote" class="text-[11px] text-slate-300">Lotes aprobados para despacho</label>
+            <select id="bodegaLote" class="control mt-0.5" aria-label="Selecciona el lote a despachar"></select>
+            <p class="mt-1 text-[11px] text-slate-400">Aquí aparecen los lotes aprobados por calidad que aún no han salido a ruta.</p>
+          </div>
+          <section class="space-y-2 rounded-xl border border-sky-500/30 bg-sky-500/5 p-3">
+            <h3 class="text-xs font-bold text-sky-200">Trayecto del despacho</h3>
+            <p class="text-[10px] text-slate-400">Indica los municipios para que el conductor tenga claro desde dónde sale el lote y a dónde debe llevarlo.</p>
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div><label for="despachoOrigenMunicipio" class="text-[11px] text-slate-300">Sale desde (municipio)</label><input id="despachoOrigenMunicipio" class="control mt-0.5" maxlength="100" placeholder="Ej. Pereira, Risaralda" /></div>
+              <div><label for="despachoDestinoMunicipio" class="text-[11px] text-slate-300">Llega a (municipio)</label><input id="despachoDestinoMunicipio" class="control mt-0.5" maxlength="100" placeholder="Ej. Bogotá D.C." /></div>
+            </div>
+            <div><label for="despachoDestinoDetalle" class="text-[11px] text-slate-300">Lugar de entrega (opcional)</label><input id="despachoDestinoDetalle" class="control mt-0.5" maxlength="140" placeholder="Ej. Central de abastos, local 24" /></div>
+            <div id="vistaPreviaRutaBodega" class="rounded-lg bg-black/25 p-2 text-xs text-slate-300" aria-live="polite">Completa origen y destino para revisar el trayecto.</div>
+          </section>
+          <div id="qrBox" class="grid min-h-[180px] place-items-center rounded-xl border border-dashed border-slate-700 bg-black/40 p-3 text-center text-xs text-slate-400">
+            Genera el QR para ver la imagen descargable.
+          </div>
+          <div><label for="transportistaAsignado" class="text-[11px] text-slate-300">Conductor registrado</label><select id="transportistaAsignado" class="control mt-0.5"></select></div>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="btn btn-primary" id="generarQr"><i data-lucide="qr-code" class="w-3.5 h-3.5"></i>Generar QR</button>
+            <button class="btn btn-secondary" id="despachar"><i data-lucide="send" class="w-3.5 h-3.5"></i>Asignar conductor</button>
+          </div>
+        </div>
+
+        <!-- CONDUCTOR -->
+        <div data-view="conductor" class="role-view hidden space-y-3">
+          <div>
+            <p id="conductorHuLabel" class="text-[10px] font-bold uppercase tracking-widest text-amber-300">HU-03, HU-09</p>
+            <h2 class="text-lg font-extrabold">Escaneo y Novedades</h2>
+            <p id="conductorViewDescription">Registra el recorrido, reporta novedades y confirma la entrega en destino.</p>
+          </div>
+          <div>
+            <label for="conductorLote" class="text-[11px] text-slate-300">Lote</label>
+            <select id="conductorLote" class="control mt-0.5" aria-label="Selecciona el lote en ruta"></select>
+            <button class="btn btn-secondary mt-2 w-full" id="refrescarEstadoEntrega">Actualizar estado de entrega</button>
+          </div>
+          <section id="rutaConductorResumen" class="space-y-2 rounded-xl border border-amber-400/40 bg-amber-400/5 p-3 text-xs" aria-live="polite">
+            Selecciona un lote asignado para consultar el origen y el destino.
+          </section>
+          <div class="scan-workflow">
+            <div class="overflow-hidden rounded-xl border border-dashed border-amber-500/40 bg-black/30 p-2">
+              <video id="qrVideo" class="hidden max-h-48 w-full rounded-lg object-cover" playsinline muted></video>
+              <div id="qrScanHint" class="grid min-h-[100px] place-items-center text-center p-2">
+                <div><i data-lucide="scan-qr-code" class="mx-auto h-10 w-10 text-amber-300"></i><p class="mt-1 text-xs text-slate-300">Escanea el código QR del lote con la cámara.</p></div>
+              </div>
+              <p id="qrScanStatus" class="mt-1 text-center text-[10px] text-slate-400">También puedes seleccionar el lote manualmente.</p>
+            </div>
+            <button class="btn btn-primary w-full" id="iniciarEscaner"><i data-lucide="camera" class="w-3.5 h-3.5"></i>Activar cámara y escanear QR</button>
+            <button class="btn btn-secondary w-full border-amber-400/40 text-amber-200" id="simularEscaneoQR">Simular lectura del QR seleccionado</button>
+          </div>
+          <div id="puntoControlPanel" class="space-y-2 rounded-xl border border-sky-500/30 bg-sky-500/5 p-3">
+            <h3 class="text-xs font-bold text-sky-200">Registrar punto de control</h3>
+            <p class="text-[10px] text-slate-400">Guarda una ubicación de la ruta aunque no haya ocurrido un incidente.</p>
+            <div class="grid grid-cols-2 gap-2">
+              <input id="puntoLatitud" type="number" step="any" class="control" placeholder="Latitud" aria-label="Latitud del punto" />
+              <input id="puntoLongitud" type="number" step="any" class="control" placeholder="Longitud" aria-label="Longitud del punto" />
+            </div>
+            <input id="puntoReferencia" class="control" maxlength="120" placeholder="Municipio, vía o referencia" />
+            <input id="puntoObservacion" class="control" maxlength="160" placeholder="Observación opcional" />
+            <button class="btn btn-secondary w-full" id="capturarPuntoControl">Capturar GPS</button>
+            <button class="btn btn-secondary w-full" id="guardarPuntoControl">Guardar punto en la ruta</button>
+          </div>
+          <div class="space-y-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3">
+            <h3 class="text-xs font-bold text-emerald-200">Datos de recepción</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label for="temperaturaLlegada" class="text-[11px] text-slate-300">Temperatura llegada (4–10°C)</label><input id="temperaturaLlegada" type="number" min="4" max="10" step="0.1" class="control mt-0.5" value="6" /></div>
+              <div><label for="cajasDanadas" class="text-[11px] text-slate-300">Cajas dañadas</label><input id="cajasDanadas" type="number" min="0" step="1" class="control mt-0.5" value="0" /></div>
+            </div>
+            <div><label for="temperaturaMaximaRuta" class="text-[11px] text-slate-300">Temperatura máxima en ruta (opcional)</label><input id="temperaturaMaximaRuta" type="number" step="0.1" class="control mt-0.5" placeholder="Alerta si supera 12°C" /></div>
+          </div>
+          <div class="space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
+            <h3 class="text-xs font-bold text-amber-200">Registrar suceso en ruta</h3>
+            <div><label for="tipoIncidente" class="text-[11px] text-slate-300">Suceso</label>
+              <select id="tipoIncidente" class="control mt-0.5">
+                <option value="Camion varado">Camión varado</option>
+                <option value="Choque">Choque / accidente</option>
+                <option value="Trancon por vias cerradas">Trancón por vías cerradas</option>
+                <option value="Via cerrada">Vía cerrada</option>
+                <option value="Derrumbe">Derrumbe</option>
+                <option value="Falla mecanica">Falla mecánica</option>
+                <option value="Clima adverso">Clima adverso</option>
+                <option value="Otro">Otro suceso</option>
+              </select>
+            </div>
+            <div><label for="detalleIncidente" class="text-[11px] text-slate-300">Descripción (máximo 180 caracteres)</label>
+              <textarea id="detalleIncidente" class="control mt-0.5 min-h-16" maxlength="180" placeholder="Describe el lugar y lo ocurrido"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label for="incidenteLatitud" class="text-[11px] text-slate-300">Latitud</label><input id="incidenteLatitud" type="number" step="any" class="control mt-0.5" placeholder="4.7110" /></div>
+              <div><label for="incidenteLongitud" class="text-[11px] text-slate-300">Longitud</label><input id="incidenteLongitud" type="number" step="any" class="control mt-0.5" placeholder="-74.0721" /></div>
+            </div>
+            <div><label for="incidenteReferencia" class="text-[11px] text-slate-300">Referencia del lugar (opcional)</label><input id="incidenteReferencia" class="control mt-0.5" maxlength="120" placeholder="Carretera, kilómetro, municipio…" /></div>
+            <button class="btn btn-secondary w-full" id="capturarUbicacion"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i>Usar mi ubicación GPS</button>
+            <button class="btn btn-danger w-full" id="reportarIncidente"><i data-lucide="triangle-alert" class="w-3.5 h-3.5"></i>Guardar suceso</button>
+          </div>
+        </div>
+
+        <!-- TIENDA -->
+        <div data-view="tienda" class="role-view hidden space-y-3">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-300">HU-04, HU-05</p>
+            <h2 class="text-lg font-extrabold">Consulta y Venta</h2>
+            <p>Verifica el origen del producto y registra su venta con la información de trazabilidad.</p>
+          </div>
+          <div>
+            <label for="consultaLote" class="text-[11px] text-slate-300">Codigo de lote</label>
+            <select id="consultaLote" class="control mt-0.5" aria-label="Selecciona el codigo de lote a consultar"></select>
+          </div>
+          <div class="grid h-36 place-items-center overflow-hidden rounded-xl border border-slate-800">
+            <img alt="Aguacates" class="h-full w-full object-cover" src="https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=80" />
+          </div>
+          <div class="grid grid-cols-1 gap-2">
+            <button class="btn btn-primary w-full" id="consultarOrigen"><i data-lucide="search-check" class="w-4 h-4"></i>Consultar origen</button>
+            <button class="btn btn-danger w-full" id="venderLote"><i data-lucide="flame" class="w-3.5 h-3.5"></i>Marcar vendido</button>
+          </div>
+          <section id="origenResumen" class="hidden space-y-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 text-xs" aria-live="polite"></section>
+        </div>
+
+        <!-- ADMIN -->
+        <div data-view="admin" class="role-view hidden space-y-3">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-violet-300">HU-10</p>
+            <h2 class="text-lg font-extrabold">Administración</h2>
+            <p>Supervisa las vinculaciones, los usuarios, las fincas y el avance de los lotes.</p>
+          </div>
+          <section class="space-y-2 rounded-xl border border-slate-700 bg-black/20 p-2.5">
+            <h3 class="text-xs font-bold text-violet-200">Solicitudes de vinculación</h3>
+            <p class="text-[10px] text-slate-400">Revisa los documentos y aprueba o rechaza. Al aprobar se crea una cuenta pendiente y se envía el enlace para crear contraseña.</p>
+            <div id="solicitudesAdmin" class="space-y-2 text-xs"><p class="text-slate-400">Cargando solicitudes…</p></div>
+          </section>
+          <section class="space-y-2 rounded-xl border border-slate-700 bg-black/20 p-2.5">
+            <h3 class="text-xs font-bold text-violet-200">Usuarios y roles registrados</h3>
+            <p class="text-[10px] text-slate-400">Las cuentas se crean mediante solicitudes aprobadas. Desde aquí puedes buscar y editar cuentas existentes.</p>
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_14rem]">
+              <input id="filtroUsuariosAdmin" class="control" type="search" placeholder="Buscar usuario por nombre, correo o wallet" aria-label="Buscar usuarios" />
+              <select id="filtroRolUsuarioAdmin" class="control" aria-label="Filtrar usuarios por rol"><option value="">Todos los roles</option><option>Administrador</option><option>Productor</option><option>Inspector de calidad</option><option>Bodeguero</option><option>Transportador</option><option>Receptor</option><option>Vendedor</option></select>
+            </div>
+            <p id="resultadoUsuariosAdmin" class="text-[10px] text-slate-400"></p>
+            <div class="table-wrap max-h-40 overflow-y-auto"><table>
+              <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Wallet / ID</th><th>Estado</th><th>Acción</th></tr></thead>
+              <tbody id="usuariosAdminTable"><tr><td colspan="6" class="text-center text-slate-400">Carga el panel de administración.</td></tr></tbody>
+            </table></div>
+          </section>
+          <section class="space-y-2 rounded-xl border border-lime-500/30 bg-lime-500/5 p-3">
+            <h3 class="text-xs font-bold text-lime-200">Registrar finca de un productor</h3>
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <input id="adminFincaNombre" class="control" placeholder="Nombre de la finca" />
+              <input id="adminFincaIca" class="control" placeholder="Registro ICA" />
+              <input id="adminFincaGps" class="control" placeholder="Latitud,longitud" />
+              <select id="adminFincaProductor" class="control" aria-label="Productor dueño de la finca"></select>
+            </div>
+            <button class="btn btn-secondary w-full" id="registrarFincaAdmin">Registrar finca</button>
+          </section>
+          <section class="space-y-2 rounded-xl border border-slate-700 bg-black/20 p-2.5">
+            <h3 class="text-xs font-bold text-lime-200">Fincas registradas</h3>
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_14rem]">
+              <input id="filtroFincasAdmin" class="control" type="search" placeholder="Buscar finca por nombre, ICA o GPS" aria-label="Buscar fincas" />
+              <select id="filtroProductorFincaAdmin" class="control" aria-label="Filtrar fincas por productor"><option value="">Todos los productores</option></select>
+            </div>
+            <p id="resultadoFincasAdmin" class="text-[10px] text-slate-400"></p>
+            <div class="table-wrap max-h-40 overflow-y-auto">
+              <table>
+                <thead><tr><th>Finca</th><th>ICA</th><th>GPS</th><th>Productor</th><th>Estado</th><th>Ficha PDF</th><th>Acción</th></tr></thead>
+                <tbody id="fincasAdminTable"><tr><td colspan="7" class="text-center text-slate-400">Cargando fincas…</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+          <div class="table-wrap max-h-48 overflow-y-auto">
+            <div class="grid grid-cols-1 gap-2 border-b border-slate-700 p-2 sm:grid-cols-[minmax(0,1fr)_14rem]">
+              <input id="filtroLotesAdmin" class="control" type="search" placeholder="Buscar lote, finca, productor o conductor" aria-label="Buscar lotes" />
+              <select id="filtroEstadoLoteAdmin" class="control" aria-label="Filtrar lotes por estado"><option value="">Todos los estados</option><option>Registrado</option><option>Aprobado_Calidad</option><option>Rechazado_En_Origen</option><option>En Transito</option><option>En Punto de Venta</option><option>Vendido</option></select>
+            </div>
+            <p id="resultadoLotesAdmin" class="px-2 pt-2 text-[10px] text-slate-400"></p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Bloque/Lote</th>
+                  <th>Finca / productor</th>
+                  <th>Variedad</th>
+                  <th>Peso</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="bloquesTable">
+                <tr>
+                  <td colspan="6" class="text-slate-400 text-center">Cargando lotes…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <section class="space-y-2 rounded-xl border border-violet-500/30 bg-violet-500/5 p-3">
+            <h3 class="text-xs font-bold text-violet-200">Detalle completo del lote</h3>
+            <div class="flex gap-2">
+              <select id="loteAdminDetalle" class="control min-w-0 flex-1" aria-label="Seleccionar lote para ver detalle"></select>
+              <button class="btn btn-secondary !px-3" id="verDetalleLote">Ver detalle</button>
+            </div>
+            <div id="detalleLoteAdmin" class="space-y-2 text-[11px] text-slate-300">Selecciona un lote para ver ubicación, inspección, recepción, incidentes e historial.</div>
+          </section>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <div id="appToast" class="app-toast hidden" role="status" aria-live="polite"></div>
+
+  <script>
+    const aplicarTema = (tema, guardar = false) => {
+      const modo = tema === "light" ? "light" : "dark";
+      document.documentElement.dataset.theme = modo;
+      document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        const modoSiguiente = modo === "dark" ? "claro" : "oscuro";
+        const icono = modo === "dark" ? "sun" : "moon";
+        button.innerHTML = `<i data-lucide="${icono}" class="h-4 w-4"></i><span class="hidden sm:inline">Modo ${modoSiguiente}</span>`;
+        button.setAttribute("aria-label", `Cambiar a modo ${modoSiguiente}`);
+        button.title = `Cambiar a modo ${modoSiguiente}`;
+        button.setAttribute("aria-pressed", String(modo === "light"));
+      });
+      if (guardar) {
+        try { localStorage.setItem("avochain-theme", modo); } catch { /* La preferencia visual es opcional. */ }
+      }
+      if (window.lucide) window.lucide.createIcons();
+    };
+    aplicarTema(document.documentElement.dataset.theme);
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+      button.addEventListener("click", () => aplicarTema(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true));
+    });
+
+    let tokenSesion = sessionStorage.getItem("avochain-token") || "";
+    let usuarioActual = null;
+    const api = async (url, options = {}) => {
+      const { body, headers = {}, ...requestOptions } = options;
+      const response = await fetch(url, {
+        ...requestOptions,
+        headers: { "Content-Type": "application/json", ...(tokenSesion ? { Authorization: `Bearer ${tokenSesion}` } : {}), ...headers },
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {})
+      });
+      const contentType = response.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await response.json()
+        : { error: (await response.text()).trim() || `El servidor respondió HTTP ${response.status}.` };
+      if (response.status === 401 && tokenSesion) cerrarSesion("La sesión venció. Inicia sesión de nuevo.");
+      if (!response.ok) throw data;
+      return data;
+    };
+
+    let toastTimer;
+    const show = (data, ok = true) => {
+      const toast = document.querySelector("#appToast");
+      const message = typeof data === "string"
+        ? data
+        : data?.error || data?.mensaje || data?.message || (ok ? "Operación completada correctamente." : "No se pudo completar la operación.");
+      toast.textContent = message;
+      toast.classList.toggle("toast-success", ok);
+      toast.classList.toggle("toast-error", !ok);
+      toast.classList.remove("hidden");
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => toast.classList.add("hidden"), 5000);
+    };
+
+    const run = async (action) => {
+      try { show(await action()); } catch (error) { show(error, false); }
+    };
+
+    document.querySelector("#abrirSolicitud").onclick = () => { document.querySelector("#loginScreen").classList.add("hidden"); document.querySelector("#solicitudScreen").classList.remove("hidden"); };
+    document.querySelector("#cancelarSolicitud").onclick = () => { document.querySelector("#solicitudScreen").classList.add("hidden"); document.querySelector("#loginScreen").classList.remove("hidden"); };
+    document.querySelector("#solicitudForm").addEventListener("submit", async (event) => {
+      event.preventDefault(); const form = event.currentTarget; const error = document.querySelector("#solicitudError"); error.classList.add("hidden");
+      try {
+        const files = [...document.querySelector("#solicitudArchivos").files];
+        if (files.length < 1 || files.length > 3) throw new Error("Adjunta entre 1 y 3 documentos.");
+        const documentos = await Promise.all(files.map(async (file) => {
+          if (file.size > 2 * 1024 * 1024) throw new Error(`${file.name}: el máximo es 2 MB.`);
+          if (!file.type || !["application/pdf", "image/jpeg", "image/png"].includes(file.type)) throw new Error(`${file.name}: usa un PDF, JPG o PNG válido.`);
+          const bytes = new Uint8Array(await file.arrayBuffer());
+          let binary = "";
+          for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+            binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+          }
+          return { nombreArchivo: file.name, mimeType: file.type, contenidoBase64: btoa(binary) };
+        }));
+        const data = Object.fromEntries(new FormData(form));
+        const result = await api("/api/v1/vinculaciones", { method: "POST", body: { ...data, aceptaTratamiento: form.aceptaTratamiento.checked, documentos } });
+        form.reset(); document.querySelector("#solicitudScreen").classList.add("hidden"); document.querySelector("#loginScreen").classList.remove("hidden"); show(result.mensaje || "Solicitud enviada. Espera la revisión del administrador.");
+      } catch (e) { error.textContent = e?.error || e?.message || "No se pudo enviar la solicitud."; error.classList.remove("hidden"); }
+    });
+    const tokenActivacionUrl = new URLSearchParams(window.location.search).get("activar-cuenta");
+    if (tokenActivacionUrl) { tokenSesion = ""; usuarioActual = null; sessionStorage.removeItem("avochain-token"); document.querySelector("#appShell").classList.add("hidden"); document.querySelector("#loginScreen").classList.add("hidden"); document.querySelector("#activarCuentaScreen").classList.remove("hidden"); }
+    document.querySelector("#activarCuentaForm").addEventListener("submit", async (event) => {
+      event.preventDefault(); const error = document.querySelector("#activarError"); error.classList.add("hidden");
+      try {
+        const password = document.querySelector("#activarPassword").value;
+        if (password !== document.querySelector("#activarPassword2").value) throw new Error("Las contraseñas no coinciden.");
+        const result = await api("/api/v1/auth/activar-cuenta", { method: "POST", body: { token: tokenActivacionUrl, password } });
+        window.history.replaceState({}, "", window.location.pathname); document.querySelector("#activarCuentaScreen").classList.add("hidden"); document.querySelector("#loginScreen").classList.remove("hidden"); show(result.mensaje);
+      } catch (e) { error.textContent = e?.error || e?.message || "No se pudo activar la cuenta."; error.classList.remove("hidden"); }
+    });
+
+    const cerrarSesion = (mensaje) => {
+      tokenSesion = ""; usuarioActual = null;
+      sessionStorage.removeItem("avochain-token");
+      document.querySelector("#appShell").classList.add("hidden");
+      document.querySelector("#loginScreen").classList.remove("hidden");
+      document.querySelector("#loginPassword").value = "";
+      const loginError = document.querySelector("#loginError");
+      if (mensaje) {
+        loginError.textContent = mensaje;
+        loginError.classList.remove("hidden");
+      } else {
+        loginError.classList.add("hidden");
+      }
+    };
+
+    const aplicarRolUI = () => {
+      const mapa = { Productor: "productor", "Inspector de calidad": "calidad", Bodeguero: "bodega", Transportador: "conductor", Receptor: "conductor", Vendedor: "tienda", Administrador: "admin" };
+      const vista = mapa[usuarioActual?.rol];
+      document.querySelectorAll("[data-role]").forEach((button) => {
+        button.hidden = button.dataset.role !== vista;
+        button.classList.toggle("role-active", button.dataset.role === vista);
+      });
+      document.querySelectorAll(".role-view").forEach((item) => item.classList.toggle("hidden", item.dataset.view !== vista));
+      document.querySelector("#currentUserLabel").textContent = `${usuarioActual?.nombre || ""} · ${usuarioActual?.rol || ""}`;
+      document.querySelector("#premiumEmail").value = usuarioActual?.email || "";
+      document.querySelector(".premium-panel").classList.toggle("hidden", usuarioActual?.rol !== "Productor");
+      document.querySelector("#reportarIncidente").closest(".space-y-2.rounded-xl").classList.toggle("hidden", usuarioActual?.rol !== "Transportador");
+      document.querySelector("#puntoControlPanel").classList.toggle("hidden", usuarioActual?.rol !== "Transportador");
+      const esReceptor = usuarioActual?.rol === "Receptor";
+      document.querySelector('[data-view="conductor"] h2').textContent = esReceptor ? "Recepción de lotes" : "Escaneo y Novedades";
+      document.querySelector('[data-role="conductor"] [data-role-label]').textContent = esReceptor ? "Receptor" : "Conductor";
+      document.querySelector('[data-role="conductor"]').setAttribute("aria-label", esReceptor ? "Receptor" : "Conductor");
+      document.querySelector('[data-role="conductor"] [data-lucide]').setAttribute("data-lucide", esReceptor ? "package-check" : "truck");
+      document.querySelector("#conductorHuLabel").textContent = esReceptor ? "ETAPA · RECEPCIÓN" : "HU-03, HU-09";
+      document.querySelector("#conductorViewDescription").textContent = esReceptor
+        ? "Selecciona un lote en tránsito y confirma su llegada con el QR o manualmente."
+        : "Registra el recorrido, reporta novedades y confirma la entrega en destino.";
+      document.querySelector("#simularEscaneoQR").textContent = esReceptor ? "Confirmar recepción del lote seleccionado" : "Simular lectura del QR seleccionado";
+      document.querySelector("#simularEscaneoQR").setAttribute("aria-label", esReceptor ? "Confirmar la recepción del lote seleccionado sin usar la cámara" : "Simular lectura del QR seleccionado");
+      document.querySelector("#iniciarEscaner").innerHTML = esReceptor
+        ? '<i data-lucide="camera" class="w-3.5 h-3.5"></i>Escanear QR y confirmar recepción'
+        : '<i data-lucide="camera" class="w-3.5 h-3.5"></i>Activar cámara y escanear QR';
+      if (window.lucide) window.lucide.createIcons();
+    };
+
+    document.querySelector("#loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const errorBox = document.querySelector("#loginError");
+      errorBox.classList.add("hidden");
+      try {
+        const result = await api("/api/v1/auth/login", { method: "POST", body: { email: document.querySelector("#loginEmail").value, password: document.querySelector("#loginPassword").value } });
+        tokenSesion = result.token;
+        usuarioActual = result.usuario;
+        sessionStorage.setItem("avochain-token", tokenSesion);
+        document.querySelector("#loginScreen").classList.add("hidden");
+        document.querySelector("#appShell").classList.remove("hidden");
+        aplicarRolUI();
+      } catch (error) {
+        errorBox.textContent = error?.error || "No fue posible iniciar sesión.";
+        errorBox.classList.remove("hidden");
+        return;
+      }
+      try { await cargarEstadoSesion(); }
+      catch (error) {
+        if (!tokenSesion) return;
+        show(`Sesión iniciada, pero no se pudieron cargar todos los datos: ${error?.error || error?.message || "intenta actualizar la página"}`, false);
+      }
+    });
+    document.querySelector("#logoutButton").onclick = () => cerrarSesion();
+
+    // En vez de escribir IDs a mano, las fincas y lotes se seleccionan de
+    // listas desplegables que reflejan lo que realmente existe en el backend.
+    let loteActivo = "";
+    let fincasRegistradas = [];
+    let productoresRegistrados = [];
+    let usuariosAdminCache = [];
+    let fincasAdminCache = [];
+    let lotesAdminCache = [];
+    let lotesRutaConductor = [];
+    const fechaCosechaInput = document.querySelector("#loteFecha");
+    const fechaLocalHoy = new Date();
+    const fechaHoyISO = `${fechaLocalHoy.getFullYear()}-${String(fechaLocalHoy.getMonth() + 1).padStart(2, "0")}-${String(fechaLocalHoy.getDate()).padStart(2, "0")}`;
+    fechaCosechaInput.max = fechaHoyISO;
+    fechaCosechaInput.value = fechaHoyISO;
+
+    const renderFincaSelect = (seleccionarId) => {
+      const select = document.querySelector("#loteFincaId");
+      const previa = select.value;
+      const aprobadas = fincasRegistradas.filter((finca) => finca.activa && (finca.estadoAprobacion || "Aprobada") === "Aprobada");
+      select.innerHTML = aprobadas
+        .map((finca) => `<option value="${finca.id}">${finca.id} — ${finca.nombre}</option>`)
+        .join("") || `<option value="">Solicita y espera aprobación de una finca</option>`;
+      document.querySelector("#crearLote").disabled = aprobadas.length === 0;
+      const objetivo = seleccionarId || previa;
+      if (aprobadas.some((finca) => finca.id === objetivo)) select.value = objetivo;
+    };
+
+    const refrescarFincas = async () => {
+      fincasRegistradas = await api("/api/v1/fincas");
+      renderFincaSelect();
+      document.querySelector("#misFincasProductor").innerHTML = fincasRegistradas.map((finca) => {
+        const estado = finca.estadoAprobacion || (finca.activa ? "Aprobada" : "Inactiva");
+        return `<div class="flex flex-wrap justify-between gap-2 rounded bg-black/20 p-2"><span><strong>${escaparHtml(finca.nombre)}</strong> · ICA ${escaparHtml(finca.registroICA)}</span><span class="${estado === "Aprobada" ? "text-emerald-300" : estado === "Pendiente" ? "text-amber-300" : "text-rose-300"}">${escaparHtml(estado === "Pendiente" ? "Pendiente de aprobación" : estado)}</span></div>`;
+      }).join("") || `<p class="text-slate-400">Aún no has registrado fincas.</p>`;
+      return fincasRegistradas;
+    };
+
+    const renderRutaConductor = () => {
+      const panel = document.querySelector("#rutaConductorResumen");
+      const lote = lotesRutaConductor.find((item) => item.id === document.querySelector("#conductorLote").value);
+      if (!lote) {
+        panel.innerHTML = "<p>No tienes lotes asignados en tránsito.</p>";
+        return;
+      }
+      const ruta = lote.rutaDespacho;
+      const ultimoPunto = lote.puntosControlRuta?.at(-1);
+      const ultimaNovedad = lote.incidentes?.at(-1);
+      const trayecto = ruta?.origenMunicipio && ruta?.destinoMunicipio
+        ? `<div class="grid gap-2 sm:grid-cols-2">
+            <p class="rounded-lg bg-black/25 p-2"><span class="block text-[10px] uppercase text-slate-400">Sale desde</span><strong>${escaparHtml(ruta.origenMunicipio)}</strong></p>
+            <p class="rounded-lg bg-black/25 p-2"><span class="block text-[10px] uppercase text-slate-400">Debe llegar a</span><strong>${escaparHtml(ruta.destinoMunicipio)}</strong>${ruta.destinoDetalle ? `<span class="mt-1 block text-slate-300">${escaparHtml(ruta.destinoDetalle)}</span>` : ""}</p>
+          </div>
+          <a class="btn btn-secondary w-full" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(ruta.origenMunicipio)}&destination=${encodeURIComponent(ruta.destinoMunicipio)}" target="_blank" rel="noopener">Abrir trayecto en Google Maps</a>`
+        : `<p class="mt-1">Bodega aún no registró el municipio de origen y destino para este lote.</p>`;
+      const recepcion = lote.recepcionDestino
+        ? `<div class="rounded-lg border border-emerald-400/40 bg-emerald-400/10 p-2 text-emerald-100">
+            <strong>Entrega confirmada por el receptor</strong>
+            <p>Recibió: ${escaparHtml(lote.recepcionDestino.recibidoPor)} · ${escaparHtml(lote.recepcionDestino.recibidoEn)}</p>
+            <p>Temperatura: ${escaparHtml(lote.recepcionDestino.temperaturaC)}°C · Cajas dañadas: ${escaparHtml(lote.recepcionDestino.cajasDanadas)}</p>
+          </div>`
+        : lote.estado === "En Transito"
+          ? `<p class="rounded-lg bg-amber-400/10 p-2 text-amber-100">Entrega pendiente: cuando llegues, el Receptor debe escanear el QR y confirmar la recepción para dejar registrado el traspaso de custodia.</p>`
+          : "";
+      panel.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2"><strong class="text-amber-200">Ruta del lote ${escaparHtml(lote.id)}</strong><span class="badge bg-sky-500/15 text-sky-200">${escaparHtml(lote.estado)}</span></div>
+        ${trayecto}
+        ${recepcion}
+        <div class="flex flex-wrap justify-between gap-2 text-[10px] text-slate-400"><span>${lote.puntosControlRuta?.length || 0} punto(s) de control</span><span>${lote.incidentes?.length || 0} suceso(s) reportado(s)</span></div>
+        ${ultimoPunto ? `<p class="text-[10px] text-slate-300">Último punto: ${escaparHtml(ultimoPunto.ubicacion?.referencia || "GPS registrado")} · ${escaparHtml(ultimoPunto.registradoEn)}</p>` : ""}
+        ${ultimaNovedad ? `<p class="text-[10px] text-amber-200">Último suceso: ${escaparHtml(ultimaNovedad.tipo)} · ${escaparHtml(ultimaNovedad.ubicacion?.referencia || ultimaNovedad.comentario)}</p>` : ""}
+      `;
+    };
+
+    const renderLoteSelects = (lotes) => {
+      lotesRutaConductor = lotes;
+      const renderOpciones = (items, vacio) => items.length
+        ? items.map((lote) => `<option value="${lote.id}">${lote.id} — ${lote.estado}</option>`).join("")
+        : `<option value="">${vacio}</option>`;
+      [
+        { selector: "#bodegaLote", items: lotes.filter((lote) => lote.estado === "Aprobado_Calidad"), vacio: "No hay lotes aprobados pendientes de despacho" },
+        { selector: "#conductorLote", items: lotes.filter((lote) => ["En Transito", "En Punto de Venta"].includes(lote.estado)), vacio: "Sin lotes asignados en ruta o recibidos" },
+        { selector: "#evidenciasLoteId", items: lotes, vacio: "Registra un lote primero" },
+        { selector: "#consultaLote", items: lotes, vacio: "Sin lotes registrados" }
+      ].forEach(({ selector, items, vacio }) => {
+        const select = document.querySelector(selector);
+        const previa = select.value;
+        select.innerHTML = renderOpciones(items, vacio);
+        if (items.some((lote) => lote.id === loteActivo)) select.value = loteActivo;
+        else if (items.some((lote) => lote.id === previa)) select.value = previa;
+      });
+      const calidadSelect = document.querySelector("#calidadLote");
+      const pendientes = lotes.filter((lote) => lote.estado === "Registrado" && !lote.inspeccionCalidad);
+      calidadSelect.innerHTML = pendientes.length
+        ? pendientes.map((lote) => `<option value="${lote.id}">${lote.id} — Pendiente de calidad</option>`).join("")
+        : `<option value="">No hay lotes pendientes</option>`;
+      if (pendientes.some((lote) => lote.id === loteActivo)) calidadSelect.value = loteActivo;
+      renderRutaConductor();
+    };
+    document.querySelector("#evidenciasLoteId").addEventListener("change", (event) => { loteActivo = event.currentTarget.value; });
+    document.querySelector("#conductorLote").addEventListener("change", renderRutaConductor);
+    document.querySelector("#refrescarEstadoEntrega").onclick = () => run(async () => {
+      await refrescarLotes();
+      return { mensaje: "Estado de entrega actualizado." };
+    });
+    const renderVistaPreviaRutaBodega = () => {
+      const origen = document.querySelector("#despachoOrigenMunicipio").value.trim();
+      const destino = document.querySelector("#despachoDestinoMunicipio").value.trim();
+      const detalle = document.querySelector("#despachoDestinoDetalle").value.trim();
+      document.querySelector("#vistaPreviaRutaBodega").innerHTML = origen && destino
+        ? `<strong>Trayecto:</strong> ${escaparHtml(origen)} <span class="text-lime-300">→</span> ${escaparHtml(destino)}${detalle ? `<br><strong>Entrega:</strong> ${escaparHtml(detalle)}` : ""}`
+        : "Completa origen y destino para revisar el trayecto.";
+    };
+    ["#despachoOrigenMunicipio", "#despachoDestinoMunicipio", "#despachoDestinoDetalle"].forEach((selector) => document.querySelector(selector).addEventListener("input", renderVistaPreviaRutaBodega));
+
+    // Vuelve a pedir la lista de lotes al backend y refresca las 3 listas
+    // desplegables (bodega, conductor, tienda) con los IDs y estados reales.
+    const refrescarLotes = async () => {
+      const lotes = await api("/api/v1/lotes");
+      renderLoteSelects(lotes);
+      return lotes;
+    };
+
+    let accesoPremium = false;
+    let pagoDemoPermitido = true;
+    const correoPremium = () => document.querySelector("#premiumEmail").value.trim().toLowerCase();
+    const actualizarEstadoPremium = async () => {
+      const email = correoPremium();
+      if (!email) throw new Error("Escribe el correo asociado a la cuenta para consultar el plan.");
+      const estado = await api(`/api/v1/pagos/wompi/estado?email=${encodeURIComponent(email)}`);
+      accesoPremium = estado.premiumPagado;
+      pagoDemoPermitido = estado.pagoDemoDisponible;
+      const badge = document.querySelector("#planBadge");
+      badge.dataset.precioCop = estado.wompi.precioCop || "99000";
+      if (estado.premiumPagado) {
+        badge.textContent = "PREMIUM PAGADO";
+        badge.className = "badge bg-lime-500/20 text-lime-200";
+        document.querySelector("#premiumAccessInfo").textContent = `Premium activo para ${email}.`;
+        document.querySelector("#planActionInfo").textContent = "Seguimiento completo de tus propios lotes habilitado.";
+      } else if (estado.modoBeta) {
+        badge.textContent = "BETA GRATUITA";
+        badge.className = "badge bg-sky-500/20 text-sky-200";
+        document.querySelector("#premiumAccessInfo").textContent = `Beta gratuita activa para ${email}.`;
+        document.querySelector("#planActionInfo").textContent = "Puedes registrar lotes sin costo; el detalle completo de su trazabilidad requiere Premium.";
+      } else {
+        badge.textContent = "PLAN GRATUITO";
+        badge.className = "badge bg-slate-800 text-slate-300";
+        document.querySelector("#premiumAccessInfo").textContent = `No hay un pago Premium aprobado para ${email}.`;
+        document.querySelector("#planActionInfo").textContent = "El detalle completo de tus lotes requiere Premium.";
+      }
+      const wompiButton = document.querySelector("#pagarPremium");
+      wompiButton.disabled = estado.premiumPagado || usuarioActual?.rol !== "Productor";
+      wompiButton.textContent = estado.wompi.checkoutDisponible ? "Pagar con Wompi" : "Simular checkout Wompi";
+      wompiButton.title = estado.wompi.checkoutDisponible ? "Abrir checkout seguro de Wompi" : "Wompi no está configurado; abre una simulación del checkout";
+      wompiButton.classList.toggle("opacity-50", wompiButton.disabled);
+      wompiButton.classList.toggle("cursor-not-allowed", wompiButton.disabled);
+      const demoButton = document.querySelector("#pagarPremiumDemo");
+      demoButton.hidden = !estado.pagoDemoDisponible;
+      demoButton.disabled = estado.premiumPagado || !["Productor", "Administrador"].includes(usuarioActual?.rol);
+      demoButton.classList.toggle("opacity-50", demoButton.disabled);
+      demoButton.classList.toggle("cursor-not-allowed", demoButton.disabled);
+      const adminButton = document.querySelector('[data-role="admin"]');
+      adminButton.disabled = usuarioActual?.rol !== "Administrador";
+      adminButton.title = "Abrir administración";
+      document.querySelector("#seguimientoProductor").innerHTML = estado.premiumPagado && usuarioActual?.rol === "Productor"
+        ? "Cargando tus lotes…"
+        : "El seguimiento detallado de tus lotes requiere Premium.";
+      ["#generarReportePremium", "#generarPdfPremium"].forEach((selector) => {
+        const button = document.querySelector(selector);
+        button.disabled = !estado.premiumPagado || usuarioActual?.rol !== "Productor" || (selector === "#generarPdfPremium" && !informeProductorPreparado);
+        button.classList.toggle("opacity-50", button.disabled);
+        button.classList.toggle("cursor-not-allowed", button.disabled);
+      });
+      aplicarRolUI();
+      if (usuarioActual?.rol === "Productor") {
+        const lotesProductor = await refrescarLotes();
+        renderSeguimientoProductor(lotesProductor, estado.premiumPagado);
+      }
+      return estado;
+    };
+
+    const cargarEstadoSesion = async () => {
+      usuarioActual = await api("/api/v1/auth/me");
+      aplicarRolUI();
+      const plan = usuarioActual.rol === "Productor" ? await actualizarEstadoPremium() : { premiumPagado: false };
+      if (usuarioActual.rol === "Administrador") {
+        await cargarSolicitudesVinculacion();
+        await cargarUsuariosAdmin();
+        await cargarProductores();
+        await cargarFincasAdmin();
+        await cargarBloques();
+      }
+      if (usuarioActual.rol === "Productor") await refrescarFincas();
+      if (usuarioActual.rol === "Bodeguero") await cargarTransportistas();
+      if (!["Administrador", "Productor"].includes(usuarioActual.rol)) await refrescarLotes();
+      return plan;
+    };
+
+    document.querySelector("#consultarPlan").onclick = () => run(actualizarEstadoPremium);
+    document.querySelector("#premiumEmail").addEventListener("change", () => {
+      accesoPremium = false;
+      document.querySelector('[data-role="admin"]').disabled = true;
+      ["#generarReportePremium", "#generarPdfPremium"].forEach((selector) => {
+        document.querySelector(selector).disabled = true;
+      });
+      document.querySelector("#planBadge").textContent = "Consultando";
+      document.querySelector("#planBadge").className = "badge bg-slate-800 text-slate-300";
+      document.querySelector("#premiumAccessInfo").textContent = "Consultando acceso de la cuenta…";
+      actualizarEstadoPremium().catch((error) => { document.querySelector("#premiumAccessInfo").textContent = error.message; });
+    });
+
+    const abrirSimulacionPago = (aviso) => {
+      document.querySelector("#pagoDemoCorreo").textContent = correoPremium();
+      const precio = Number(document.querySelector("#planBadge").dataset.precioCop || 99000);
+      document.querySelector("#pagoDemoValor").textContent = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(precio);
+      document.querySelector("#pagoDemoAviso").textContent = aviso || "Entorno de demostración: al confirmar se registrará un pago ficticio. No se procesará dinero real.";
+      const confirmButton = document.querySelector("#confirmarPagoDemo");
+      confirmButton.disabled = !pagoDemoPermitido;
+      confirmButton.textContent = pagoDemoPermitido ? "Confirmar pago" : "Vista previa solamente";
+      if (!pagoDemoPermitido) document.querySelector("#pagoDemoAviso").textContent += " La simulación de pagos está deshabilitada; puedes revisar el flujo, pero no confirmar.";
+      document.querySelector("#pagoDemoPasoMetodo").classList.remove("hidden");
+      document.querySelector("#pagoDemoPasoConfirmacion").classList.add("hidden");
+      document.querySelector("#pagoDemoPaso1").className = "rounded-full bg-lime-500/20 px-3 py-1 text-lime-200";
+      document.querySelector("#pagoDemoPaso2").className = "rounded-full bg-slate-800 px-3 py-1 text-slate-400";
+      mostrarCamposMetodoDemo();
+      pagoDemoModal.showModal();
+    };
+    document.querySelector("#pagarPremium").onclick = async () => {
+      if (!correoPremium()) { show({ error: "No se pudo identificar la cuenta del productor." }, false); return; }
+      try {
+        const estado = await api("/api/v1/pagos/wompi/estado");
+        if (!estado.wompi.checkoutDisponible) {
+          abrirSimulacionPago("Wompi aún no está configurado. Esta pantalla representa el checkout y no procesará un cobro real.");
+          return;
+        }
+        const checkout = await api("/api/v1/pagos/wompi/checkout", { method: "POST", body: {} });
+        window.location.assign(checkout.checkoutUrl);
+      } catch (error) {
+        abrirSimulacionPago(`No se pudo abrir Wompi (${error?.error || error?.message || "error de conexión"}). Aquí puedes ver el flujo demostrativo; no se realizará un cobro real.`);
+      }
+    };
+
+    const pagoDemoModal = document.querySelector("#pagoDemoModal");
+    const camposPagoDemo = ["#demoTitular", "#demoTarjeta", "#demoVencimiento", "#demoCvc", "#demoNequiCelular", "#demoPseBanco", "#demoPseDocumento", "#demoBancolombiaCanal"];
+    const mostrarCamposMetodoDemo = () => {
+      const metodo = document.querySelector('[name="metodoPagoDemo"]:checked')?.value;
+      document.querySelector("#pagoDemoDatosTarjeta").classList.toggle("hidden", metodo !== "Tarjeta crédito/débito");
+      document.querySelector("#pagoDemoDatosNequi").classList.toggle("hidden", metodo !== "Nequi");
+      document.querySelector("#pagoDemoDatosPse").classList.toggle("hidden", metodo !== "PSE");
+      document.querySelector("#pagoDemoDatosBancolombia").classList.toggle("hidden", metodo !== "Transferencia Bancolombia");
+    };
+    document.querySelectorAll('[name="metodoPagoDemo"]').forEach((radio) => radio.addEventListener("change", mostrarCamposMetodoDemo));
+    const validarDatosDemo = () => {
+      const metodo = document.querySelector('[name="metodoPagoDemo"]:checked').value;
+      if (metodo === "Tarjeta crédito/débito") {
+        const titular = document.querySelector("#demoTitular").value.trim();
+        const numero = document.querySelector("#demoTarjeta").value.replace(/\D/g, "");
+        const vencimiento = document.querySelector("#demoVencimiento").value.trim();
+        const cvc = document.querySelector("#demoCvc").value.trim();
+        if (titular.length < 3 || numero.length < 13 || numero.length > 19 || !/^\d{2}\/\d{2}$/.test(vencimiento) || !/^\d{3,4}$/.test(cvc)) return "Completa titular, número ficticio, vencimiento MM/AA y CVC de prueba.";
+        const [mes, anio] = vencimiento.split("/").map(Number); const hoy = new Date();
+        if (mes < 1 || mes > 12 || 2000 + anio < hoy.getFullYear() || (2000 + anio === hoy.getFullYear() && mes < hoy.getMonth() + 1)) return "Usa una fecha de vencimiento futura válida para la demostración.";
+      }
+      if (metodo === "Nequi" && !/^3\d{9}$/.test(document.querySelector("#demoNequiCelular").value.trim())) return "Escribe un número Nequi de prueba de 10 dígitos que empiece por 3.";
+      if (metodo === "PSE" && (!document.querySelector("#demoPseBanco").value || document.querySelector("#demoPseDocumento").value.trim().length < 5)) return "Selecciona un banco y escribe un documento ficticio de al menos 5 caracteres.";
+      if (metodo === "Transferencia Bancolombia" && !document.querySelector("#demoBancolombiaCanal").value) return "Selecciona un canal de pago de demostración.";
+      return "";
+    };
+    pagoDemoModal.addEventListener("close", () => {
+      camposPagoDemo.forEach((selector) => { const el = document.querySelector(selector); if (el) el.value = ""; });
+      document.querySelector("#pagoDemoValidacion").classList.add("hidden");
+      const tarjeta = document.querySelector('[name="metodoPagoDemo"][value="Tarjeta crédito/débito"]'); if (tarjeta) tarjeta.checked = true;
+      mostrarCamposMetodoDemo();
+    });
+    document.querySelector("#pagarPremiumDemo").onclick = () => {
+      if (!correoPremium()) {
+        show({ error: "Escribe el correo asociado a la cuenta antes de iniciar la demostración." }, false);
+        document.querySelector("#premiumEmail").focus();
+        return;
+      }
+      abrirSimulacionPago("Demostración manual: se registrará un pago ficticio y no se realizará ningún cobro real.");
+    };
+    document.querySelector("#cancelarPagoDemo").onclick = () => pagoDemoModal.close();
+    document.querySelector("#cancelarPagoDemoConfirmacion").onclick = () => pagoDemoModal.close();
+    document.querySelector("#continuarPagoDemo").onclick = () => {
+      const error = validarDatosDemo();
+      const errorBox = document.querySelector("#pagoDemoValidacion");
+      if (error) { errorBox.textContent = error; errorBox.classList.remove("hidden"); return; }
+      errorBox.classList.add("hidden");
+      const metodo = document.querySelector('[name="metodoPagoDemo"]:checked').value;
+      document.querySelector("#pagoDemoMetodo").textContent = metodo;
+      document.querySelector("#pagoDemoPasoMetodo").classList.add("hidden");
+      document.querySelector("#pagoDemoPasoConfirmacion").classList.remove("hidden");
+      document.querySelector("#pagoDemoPaso1").className = "rounded-full bg-emerald-500/20 px-3 py-1 text-emerald-200";
+      document.querySelector("#pagoDemoPaso2").className = "rounded-full bg-lime-500/20 px-3 py-1 text-lime-200";
+    };
+    document.querySelector("#volverMetodoPagoDemo").onclick = () => {
+      document.querySelector("#pagoDemoPasoConfirmacion").classList.add("hidden");
+      document.querySelector("#pagoDemoPasoMetodo").classList.remove("hidden");
+      document.querySelector("#pagoDemoPaso1").className = "rounded-full bg-lime-500/20 px-3 py-1 text-lime-200";
+      document.querySelector("#pagoDemoPaso2").className = "rounded-full bg-slate-800 px-3 py-1 text-slate-400";
+    };
+    document.querySelector("#confirmarPagoDemo").onclick = () => run(async () => {
+      const button = document.querySelector("#confirmarPagoDemo");
+      const metodo = document.querySelector('[name="metodoPagoDemo"]:checked').value;
+      button.disabled = true; button.textContent = "Procesando…";
+      try {
+        const resultado = await api("/api/v1/pagos/demo/confirmar", { method: "POST", body: { metodo } });
+        pagoDemoModal.close();
+        await actualizarEstadoPremium();
+        show(resultado, true);
+        return resultado;
+      } finally { button.disabled = false; button.textContent = "Confirmar pago"; }
+    });
+
+    let informeProductorPreparado = false;
+    document.querySelector("#generarReportePremium").onclick = () => run(async () => {
+      if (usuarioActual?.rol !== "Productor" || !accesoPremium) throw new Error("Esta función está disponible para productores con Premium activo.");
+      const lotes = await api("/api/v1/lotes");
+      const fincas = await api("/api/v1/fincas");
+      const fincaPorId = new Map(fincas.map((finca) => [String(finca.id), finca.nombre]));
+      const kilos = lotes.reduce((total, lote) => total + Number(lote.pesoKg || 0), 0);
+      const contenedor = document.querySelector("#reportePremium");
+      const filas = lotes.map((lote) => `
+        <tr><td>${escaparHtml(lote.id)}</td><td>${escaparHtml(lote.variedad || "—")}</td>
+        <td>${escaparHtml(fincaPorId.get(String(lote.fincaId)) || lote.nombreFinca || "—")}</td>
+        <td>${Number(lote.pesoKg || 0).toLocaleString("es-CO")} kg</td><td>${escaparHtml(lote.estado || "—")}</td>
+        <td>${Array.isArray(lote.incidentes) ? lote.incidentes.length : 0}</td></tr>`).join("");
+      contenedor.innerHTML = `
+        <header><h1 style="font-size:22px;font-weight:bold">AvoChain · Seguimiento de producción</h1>
+          <p>Productor: ${escaparHtml(usuarioActual.nombre)} · ${escaparHtml(usuarioActual.email)}</p>
+          <p>Generado: ${new Date().toLocaleString("es-CO")}</p></header>
+        <div style="display:flex;gap:24px;margin:16px 0"><strong>Lotes: ${lotes.length}</strong><strong>Producción registrada: ${kilos.toLocaleString("es-CO")} kg</strong></div>
+        ${lotes.length ? `<table style="width:100%;border-collapse:collapse"><thead><tr>${["Lote", "Variedad", "Finca", "Peso", "Estado", "Incidentes"].map((t) => `<th style="border:1px solid #aaa;padding:6px;text-align:left">${t}</th>`).join("")}</tr></thead><tbody>${filas.replaceAll("<td>", '<td style="border:1px solid #aaa;padding:6px">')}</tbody></table>` : "<p>Aún no tienes lotes registrados.</p>"}
+      `;
+      informeProductorPreparado = true;
+      const pdfButton = document.querySelector("#generarPdfPremium");
+      pdfButton.disabled = false;
+      pdfButton.classList.remove("opacity-50", "cursor-not-allowed");
+      pdfButton.title = "Abre la impresión del navegador para guardar el informe como PDF";
+      return { mensaje: `Informe preparado con ${lotes.length} lote(s) y ${kilos.toLocaleString("es-CO")} kg.` };
+    });
+    document.querySelector("#generarPdfPremium").onclick = () => {
+      if (!informeProductorPreparado || !accesoPremium || usuarioActual?.rol !== "Productor") {
+        show({ error: "Prepara el informe e inicia sesión con un productor Premium." }, false);
+        return;
+      }
+      window.print();
+    };
+    let qrCameraStream = null;
+    let qrScanFrame = null;
+    const registrarLecturaQR = async (codigo, simulada) => api(`/api/v1/lotes/${encodeURIComponent(codigo)}/qr/lectura`, {
+      method: "POST", body: { simulada }
+    });
+    const confirmarRecepcionSeleccionada = async (loteId, origen = "lote seleccionado") => {
+      if (usuarioActual?.rol !== "Receptor") throw new Error("Inicia sesión con una cuenta de rol Receptor para confirmar la llegada del lote.");
+      if (!loteId) throw new Error("Selecciona un lote en tránsito antes de confirmar la recepción.");
+      const temperaturaC = Number(document.querySelector("#temperaturaLlegada").value);
+      const cajasDanadas = Number(document.querySelector("#cajasDanadas").value);
+      const tempRutaText = document.querySelector("#temperaturaMaximaRuta").value.trim();
+      const temperaturaMaximaRutaC = tempRutaText ? Number(tempRutaText) : undefined;
+      const data = await api(`/api/v1/lotes/${encodeURIComponent(loteId)}/recepcion-destino`, {
+        method: "POST",
+        body: { temperaturaC, cajasDanadas, temperaturaMaximaRutaC }
+      });
+      document.querySelector("#qrScanStatus").textContent = `Recepción confirmada para ${loteId} (${origen}). Estado actualizado a En Punto de Venta.`;
+      document.querySelector("#qrScanStatus").className = "mt-1 text-center text-[10px] text-emerald-300";
+      await refrescarLotes();
+      return data;
+    };
+    const detenerEscanerQR = () => {
+      if (qrScanFrame !== null) cancelAnimationFrame(qrScanFrame);
+      qrScanFrame = null;
+      qrCameraStream?.getTracks().forEach((track) => track.stop());
+      qrCameraStream = null;
+      const video = document.querySelector("#qrVideo");
+      video.pause();
+      video.srcObject = null;
+      video.classList.add("hidden");
+      document.querySelector("#qrScanHint").classList.remove("hidden");
+    };
+
+    document.querySelector("#iniciarEscaner").onclick = () => run(async () => {
+      const BarcodeDetectorAPI = window.BarcodeDetector;
+      if (!navigator.mediaDevices?.getUserMedia || !BarcodeDetectorAPI) {
+        throw new Error("Este navegador no permite leer QR con cámara. Selecciona el lote en la lista manualmente.");
+      }
+      detenerEscanerQR();
+      const detector = new BarcodeDetectorAPI({ formats: ["qr_code"] });
+      qrCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+      const video = document.querySelector("#qrVideo");
+      video.srcObject = qrCameraStream;
+      video.classList.remove("hidden");
+      document.querySelector("#qrScanHint").classList.add("hidden");
+      document.querySelector("#qrScanStatus").textContent = "Buscando código QR…";
+      await video.play();
+
+      const buscarCodigo = async () => {
+        if (!qrCameraStream) return;
+        try {
+          const codigos = await detector.detect(video);
+          const codigo = codigos[0]?.rawValue?.trim();
+          if (codigo) {
+            const loteEnTransito = lotesRutaConductor.some((lote) => lote.id === codigo && lote.estado === "En Transito");
+            detenerEscanerQR();
+            if (!loteEnTransito) {
+              const mensaje = `El QR ${codigo} no corresponde a un lote en tránsito.`;
+              document.querySelector("#qrScanStatus").textContent = mensaje;
+              show({ error: mensaje }, false);
+              return;
+            }
+            document.querySelector("#conductorLote").value = codigo;
+            if (usuarioActual?.rol === "Receptor") {
+              return await confirmarRecepcionSeleccionada(codigo, "QR leído");
+            }
+            const resultado = await registrarLecturaQR(codigo, false);
+            renderRutaConductor();
+            document.querySelector("#qrScanStatus").textContent = `QR leído y validado: ${codigo}. Lectura guardada en el historial.`;
+            return resultado;
+          }
+        } catch (error) {
+          detenerEscanerQR();
+          document.querySelector("#qrScanStatus").textContent = error instanceof Error ? error.message : "No se pudo leer el QR.";
+          show({ error: document.querySelector("#qrScanStatus").textContent }, false);
+          return;
+        }
+        qrScanFrame = requestAnimationFrame(buscarCodigo);
+      };
+      qrScanFrame = requestAnimationFrame(buscarCodigo);
+      return { mensaje: "Cámara activa. Enfoca el QR del lote." };
+    });
+
+    document.querySelector("#simularEscaneoQR").onclick = () => run(async () => {
+      const loteId = document.querySelector("#conductorLote").value;
+      if (!loteId) throw new Error("Selecciona uno de tus lotes en tránsito para simular la lectura.");
+      if (usuarioActual?.rol === "Receptor") return confirmarRecepcionSeleccionada(loteId, "selección manual");
+      if (!lotesRutaConductor.some((lote) => lote.id === loteId && lote.estado === "En Transito")) {
+        throw new Error("Este lote ya llegó a destino. Actualiza el estado para consultar la confirmación del receptor.");
+      }
+      const result = await registrarLecturaQR(loteId, true);
+      document.querySelector("#qrScanStatus").textContent = `Lectura simulada registrada: QR de ${result.idLote} reconocido y asignado a tu cuenta.`;
+      document.querySelector("#qrScanStatus").className = "mt-1 text-center text-[10px] text-emerald-300";
+      return { mensaje: `Simulación correcta: se reconoció el QR del lote ${result.idLote}.` };
+    });
+
+    document.querySelectorAll("[data-role]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.hidden) return;
+        document.querySelectorAll("[data-role]").forEach((item) => {
+          item.classList.remove("role-active");
+          item.classList.add("text-slate-400");
+        });
+        document.querySelectorAll(".role-view").forEach((item) => item.classList.add("hidden"));
+        if (button.dataset.role !== "conductor") detenerEscanerQR();
+        button.classList.add("role-active");
+        button.classList.remove("text-slate-400");
+        document.querySelector(`[data-view="${button.dataset.role}"]`).classList.remove("hidden");
+      });
+    });
+
+    const cargarTransportistas = async () => {
+      const users = await api("/api/v1/usuarios/rol/Transportador");
+      const select = document.querySelector("#transportistaAsignado");
+      select.innerHTML = users.map((user) => `<option value="${escaparHtml(user.walletAddress)}">${escaparHtml(user.nombre)} · ${escaparHtml(user.walletAddress)}</option>`).join("") || `<option value="">No hay transportistas registrados</option>`;
+      select.dataset.users = JSON.stringify(users);
+      return users;
+    };
+
+    const cargarProductores = async () => {
+      const users = await api("/api/v1/usuarios/rol/Productor");
+      productoresRegistrados = users;
+      document.querySelector("#adminFincaProductor").innerHTML = users.map((user) => `<option value="${escaparHtml(user.walletAddress)}">${escaparHtml(user.nombre)} · ${escaparHtml(user.walletAddress)}</option>`).join("") || `<option value="">No hay productores registrados</option>`;
+      const productorFiltro = document.querySelector("#filtroProductorFincaAdmin");
+      const valorPrevio = productorFiltro.value;
+      productorFiltro.innerHTML = `<option value="">Todos los productores</option>${users.map((user) => `<option value="${escaparHtml(user.walletAddress)}">${escaparHtml(user.nombre)}</option>`).join("")}`;
+      if (users.some((user) => user.walletAddress === valorPrevio)) productorFiltro.value = valorPrevio;
+      return users;
+    };
+
+    document.querySelector("#registrarFincaAdmin").onclick = () => run(async () => {
+      const data = await api("/api/v1/fincas", { method: "POST", body: {
+        nombre: document.querySelector("#adminFincaNombre").value,
+        registroICA: document.querySelector("#adminFincaIca").value,
+        gps: document.querySelector("#adminFincaGps").value,
+        wallet: document.querySelector("#adminFincaProductor").value,
+        certificadoPdfUrl: "https://avochain.local/certificados/demo.pdf", certificadoPdfSizeBytes: 800000
+      }});
+      await cargarFincasAdmin();
+      document.querySelector("#adminFincaNombre").value = "";
+      return data;
+    });
+
+    document.querySelector("#solicitarFincaProductor").onclick = () => run(async () => {
+      const nombre = document.querySelector("#productorFincaNombre").value.trim();
+      const registroICA = document.querySelector("#productorFincaIca").value.trim();
+      const gps = document.querySelector("#productorFincaGps").value.trim();
+      if (!nombre || !registroICA || !gps) throw new Error("Completa nombre de finca, registro ICA y ubicación GPS.");
+      const result = await api("/api/v1/fincas/solicitar", { method: "POST", body: { nombre, registroICA, gps } });
+      document.querySelector("#productorFincaNombre").value = "";
+      document.querySelector("#productorFincaIca").value = "";
+      document.querySelector("#productorFincaGps").value = "";
+      await refrescarFincas();
+      return { mensaje: `Solicitud enviada. ${result.id} quedará disponible cuando administración la apruebe.` };
+    });
+
+    document.querySelector("#crearLote").onclick = () => run(async () => {
+      const data = await api("/api/v1/lotes", {
+        method: "POST",
+        body: {
+          fincaId: document.querySelector("#loteFincaId").value,
+          pesoKg: Number(document.querySelector("#lotePeso").value),
+          variedad: document.querySelector("#loteVariedad").value,
+          fechaCosecha: document.querySelector("#loteFecha").value,
+          wallet: usuarioActual.walletAddress,
+          rol: "Productor"
+        }
+      });
+      loteActivo = data.id;
+      if (usuarioActual.rol === "Productor") renderSeguimientoProductor(await refrescarLotes(), accesoPremium);
+      document.querySelector("#bodegaLote").value = data.id;
+      return data;
+    });
+
+    const actualizarAlertaCalidad = () => {
+      const humedad = Number(document.querySelector("#calidadHumedad").value);
+      const temperatura = Number(document.querySelector("#calidadTemperatura").value);
+      const dentro = humedad >= 60 && humedad <= 70 && temperatura >= 4 && temperatura <= 8;
+      const alerta = document.querySelector("#calidadAlerta");
+      alerta.textContent = dentro ? "Parámetros dentro del rango de exportación." : "Fuera de norma de exportación: humedad 60–70% y temperatura 4–8°C.";
+      alerta.className = dentro
+        ? "rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-2 text-[11px] text-emerald-200"
+        : "rounded-lg border border-rose-500/40 bg-rose-500/10 p-2 text-[11px] text-rose-200";
+    };
+    ["#calidadHumedad", "#calidadTemperatura"].forEach((selector) => document.querySelector(selector).addEventListener("input", actualizarAlertaCalidad));
+
+    document.querySelector("#aprobarCalidad").onclick = () => run(async () => {
+      const loteId = document.querySelector("#calidadLote").value;
+      if (!loteId) throw new Error("Registra un lote antes de inspeccionar su calidad.");
+      const informeUrl = document.querySelector("#calidadInformeUrl").value.trim();
+      const informeMb = Number(document.querySelector("#calidadInformeMb").value);
+      if (!informeUrl || !Number.isFinite(informeMb) || informeMb <= 0 || informeMb > 2) throw new Error("Ingresa la URL del informe PDF y un peso mayor a 0 y máximo 2MB.");
+      const data = await api(`/api/v1/lotes/${loteId}/inspeccion-calidad`, {
+        method: "POST",
+        body: {
+          rol: usuarioActual.rol, inspectorId: usuarioActual.walletAddress,
+          destino: document.querySelector("#calidadDestino").value,
+          humedad: Number(document.querySelector("#calidadHumedad").value),
+          temperaturaC: Number(document.querySelector("#calidadTemperatura").value),
+          evaluacionFitosanitaria: document.querySelector("#calidadFitosanitaria").value,
+          informePdfMimeType: "application/pdf", informePdfUrl: informeUrl,
+          informePdfSizeBytes: Math.round(informeMb * 1024 * 1024)
+        }
+      });
+      loteActivo = data.id;
+      if (accesoPremium) await refrescarLotes();
+      document.querySelector("#bodegaLote").value = data.id;
+      return data;
+    });
+
+    document.querySelector("#subirFotos").onclick = () => run(async () => {
+      loteActivo = document.querySelector("#evidenciasLoteId").value;
+      if (!loteActivo) throw new Error("Selecciona un lote para asociar la evidencia.");
+      const files = [...document.querySelector("#evidenciasFotos").files];
+      if (files.length < 1 || files.length > 5) throw new Error("Selecciona entre 1 y 5 fotos para la demostración.");
+      const fotos = files.map((file) => {
+        if (!["image/jpeg", "image/png"].includes(file.type)) throw new Error(`${file.name}: usa una imagen JPG o PNG.`);
+        if (file.size <= 0 || file.size > 5 * 1024 * 1024) throw new Error(`${file.name}: el tamaño máximo es 5 MB.`);
+        return { filename: file.name, mimeType: file.type, sizeBytes: file.size };
+      });
+      const result = await api(`/api/v1/lotes/${encodeURIComponent(loteActivo)}/evidencias`, { method: "POST", body: { fotos } });
+      document.querySelector("#evidenciasFotos").value = "";
+      return { mensaje: `Evidencias registradas para ${loteActivo}. El enlace IPFS es simulado.`, lote: result.id };
+    });
+
+    document.querySelector("#generarQr").onclick = () => run(async () => {
+      const data = await api(`/api/v1/lotes/${document.querySelector("#bodegaLote").value}/qr`, {
+        method: "POST",
+        body: { autorizarReimpresion: true }
+      });
+
+      const cleanBase64 = data.qrBase64.replace(/[\r\n\s]+/g, "");
+
+      document.querySelector("#qrBox").innerHTML = `
+        <div class="flex items-center justify-center p-1">
+          <img src="${cleanBase64}" alt="QR Lote" style="width: 150px; height: 150px;" class="rounded-lg bg-white p-2 object-contain" />
+        </div>
+      `;
+      return data;
+    });
+
+    document.querySelector("#despachar").onclick = () => run(async () => {
+      const conductorId = document.querySelector("#transportistaAsignado").value;
+      const conductor = (JSON.parse(document.querySelector("#transportistaAsignado").dataset.users || "[]")).find((user) => user.walletAddress === conductorId);
+      if (!conductor) throw new Error("Registra y selecciona un transportista antes de despachar.");
+      const origenMunicipio = document.querySelector("#despachoOrigenMunicipio").value.trim();
+      const destinoMunicipio = document.querySelector("#despachoDestinoMunicipio").value.trim();
+      if (!origenMunicipio || !destinoMunicipio) throw new Error("Antes de despachar, indica desde qué municipio sale y a qué municipio llega el lote.");
+      const data = await api(`/api/v1/lotes/${document.querySelector("#bodegaLote").value}/despacho`, {
+        method: "POST",
+        body: {
+          conductorId, conductorNombre: conductor.nombre, pinConfirmacion: "1234",
+          origenMunicipio, destinoMunicipio,
+          destinoDetalle: document.querySelector("#despachoDestinoDetalle").value.trim() || undefined
+        }
+      });
+      await refrescarLotes();
+      return data;
+    });
+
+    document.querySelector("#capturarUbicacion").onclick = () => run(() => new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject(new Error("Este navegador no ofrece geolocalización. Ingresa latitud y longitud manualmente."));
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          document.querySelector("#incidenteLatitud").value = coords.latitude.toFixed(6);
+          document.querySelector("#incidenteLongitud").value = coords.longitude.toFixed(6);
+          resolve({ latitud: coords.latitude, longitud: coords.longitude, mensaje: "Ubicación GPS capturada." });
+        },
+        (error) => reject(new Error(`No se pudo obtener la ubicación (${error.message}). Ingresa las coordenadas manualmente.`)),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }));
+
+    document.querySelector("#capturarPuntoControl").onclick = () => run(() => new Promise((resolve, reject) => {
+      if (!navigator.geolocation) return reject(new Error("Este navegador no ofrece geolocalización."));
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        document.querySelector("#puntoLatitud").value = coords.latitude.toFixed(6);
+        document.querySelector("#puntoLongitud").value = coords.longitude.toFixed(6);
+        resolve({ mensaje: "GPS capturado para el punto de control." });
+      }, (error) => reject(new Error(`No se pudo obtener el GPS (${error.message}).`)), { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+    }));
+
+    document.querySelector("#guardarPuntoControl").onclick = () => run(async () => {
+      const latitud = Number(document.querySelector("#puntoLatitud").value);
+      const longitud = Number(document.querySelector("#puntoLongitud").value);
+      if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) throw new Error("Captura una ubicación GPS válida.");
+      const loteId = document.querySelector("#conductorLote").value;
+      const result = await api(`/api/v1/lotes/${encodeURIComponent(loteId)}/ruta/puntos`, { method: "POST", body: {
+        ubicacion: { latitud, longitud, referencia: document.querySelector("#puntoReferencia").value.trim() || undefined },
+        observacion: document.querySelector("#puntoObservacion").value.trim() || undefined
+      }});
+      await refrescarLotes();
+      return result;
+    });
+
+    document.querySelector("#reportarIncidente").onclick = () => run(async () => {
+      const loteId = document.querySelector("#conductorLote").value;
+      const comentario = document.querySelector("#detalleIncidente").value.trim();
+      if (!comentario) throw new Error("Describe brevemente el suceso antes de guardarlo.");
+      const latitudText = document.querySelector("#incidenteLatitud").value.trim();
+      const longitudText = document.querySelector("#incidenteLongitud").value.trim();
+      if (!latitudText || !longitudText) throw new Error("Captura la ubicación GPS o ingresa latitud y longitud.");
+      const data = await api(`/api/v1/lotes/${loteId}/incidentes`, {
+        method: "POST",
+        body: {
+          conductorId: usuarioActual.walletAddress, tipo: document.querySelector("#tipoIncidente").value, comentario,
+          ubicacion: {
+            latitud: Number(latitudText), longitud: Number(longitudText),
+            referencia: document.querySelector("#incidenteReferencia").value.trim() || undefined
+          }
+        }
+      });
+      await refrescarLotes();
+      document.querySelector("#detalleIncidente").value = "";
+      document.querySelector("#incidenteReferencia").value = "";
+      return data;
+    });
+
+    document.querySelector("#consultarOrigen").onclick = async () => {
+      const resumen = document.querySelector("#origenResumen");
+      const idLote = document.querySelector("#consultaLote").value;
+      if (!idLote) return show({ error: "Selecciona un lote para consultar su origen." }, false);
+      resumen.classList.remove("hidden");
+      resumen.innerHTML = `<p class="text-slate-300">Consultando la trazabilidad del lote…</p>`;
+      try {
+        const lote = await api(`/api/v1/producto/origen/${encodeURIComponent(idLote)}`);
+        const finca = lote.finca || {};
+        const calidad = lote.inspeccionCalidad;
+        const eventos = [...(lote.eventos || [])].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+        const fechaLocal = (valor) => valor ? new Date(valor).toLocaleString("es-CO") : "Pendiente";
+        const eventoDe = (tipo) => eventos.find((evento) => evento.tipo === tipo);
+        const registro = eventoDe("Registro");
+        const eventoCalidad = eventoDe("InspeccionCalidad");
+        const eventoQr = eventoDe("QR");
+        const despacho = eventoDe("Despacho");
+        const recepcion = eventoDe("RecepcionDestino");
+        const venta = eventoDe("Venta");
+        const rechazado = lote.estado === "Rechazado_En_Origen" || calidad?.aprobada === false;
+        const etapas = [
+          { titulo: "Lote registrado", fecha: registro?.fecha || lote.fechaCosecha, detalle: `Cosecha: ${fechaLocal(lote.fechaCosecha)} · ${lote.pesoKg} kg`, estado: registro ? "Completado" : "Pendiente" },
+          { titulo: "Inspección y aprobación de calidad", fecha: eventoCalidad?.fecha || calidad?.firmadoEn, detalle: calidad ? `${calidad.aprobada ? "Aprobado" : "Rechazado"} · ${calidad.evaluacionFitosanitaria} · Humedad ${calidad.humedad}% · Temperatura ${calidad.temperaturaC}°C` : "Pendiente de inspección", estado: calidad ? (calidad.aprobada ? "Completado" : "Rechazado") : "Pendiente" },
+          { titulo: "Código QR", fecha: eventoQr?.fecha, detalle: lote.qrGenerado ? "QR generado para identificar el lote" : "Se genera después de aprobar calidad", estado: lote.qrGenerado ? "Completado" : rechazado ? "Bloqueado" : "Pendiente" },
+          { titulo: "Despacho y asignación de conductor", fecha: despacho?.fecha, detalle: lote.rutaDespacho ? `${lote.rutaDespacho.origenMunicipio} → ${lote.rutaDespacho.destinoMunicipio}${lote.rutaDespacho.destinoDetalle ? ` · ${lote.rutaDespacho.destinoDetalle}` : ""}` : (despacho?.detalle || "Pendiente de despacho"), estado: despacho ? "Completado" : rechazado ? "Bloqueado" : "Pendiente" },
+          { titulo: "Transporte y seguimiento de ruta", fecha: despacho?.fecha, detalle: `${lote.puntosControlRuta?.length || 0} punto(s) de control · ${lote.incidentes?.length || 0} incidente(s)`, estado: rechazado ? "Bloqueado" : lote.estado === "En Transito" ? "En curso" : (recepcion || venta ? "Completado" : "Pendiente") },
+          { titulo: "Recepción y cambio de custodia", fecha: recepcion?.fecha || lote.recepcionDestino?.recibidoEn, detalle: lote.recepcionDestino ? `Recibió ${lote.recepcionDestino.recibidoPor} · ${lote.recepcionDestino.temperaturaC}°C · ${lote.recepcionDestino.cajasDanadas} cajas dañadas` : "Pendiente de confirmación del receptor", estado: lote.recepcionDestino ? "Completado" : rechazado ? "Bloqueado" : "Pendiente" },
+          { titulo: "Venta al cliente", fecha: venta?.fecha, detalle: venta?.detalle || "Pendiente de venta", estado: lote.estado === "Vendido" ? "Completado" : rechazado ? "Bloqueado" : "Pendiente" }
+        ];
+        const htmlEtapas = etapas.map((etapa) => {
+          const estilo = etapa.estado === "Completado" ? "border-emerald-400 bg-emerald-400" : etapa.estado === "En curso" ? "border-amber-300 bg-amber-300" : etapa.estado === "Rechazado" || etapa.estado === "Bloqueado" ? "border-rose-400 bg-rose-400" : "border-slate-600 bg-slate-800";
+          const texto = etapa.estado === "Completado" ? "text-emerald-200" : etapa.estado === "En curso" ? "text-amber-200" : etapa.estado === "Rechazado" || etapa.estado === "Bloqueado" ? "text-rose-200" : "text-slate-400";
+          return `<li class="relative border-l border-slate-700 pb-3 pl-4 last:border-transparent"><span class="absolute -left-[5px] top-1 h-2 w-2 rounded-full border ${estilo}"></span><div class="flex flex-wrap items-center justify-between gap-1"><strong>${escaparHtml(etapa.titulo)}</strong><span class="${texto}">${escaparHtml(etapa.estado)}</span></div><p class="text-slate-300">${escaparHtml(etapa.detalle)}</p><p class="text-[10px] text-slate-500">${fechaLocal(etapa.fecha)}</p></li>`;
+        }).join("");
+        const actividadRuta = eventos.filter((evento) => ["IncidenteRuta", "PuntoControlRuta", "AlertaTemperatura"].includes(evento.tipo));
+        const gpsParts = String(finca.gps || "").split(",").map((value) => Number(value.trim()));
+        const gpsLink = gpsParts.length === 2 && gpsParts.every(Number.isFinite)
+          ? `<a class="text-cyan-300 underline" target="_blank" rel="noopener" href="https://maps.google.com/?q=${gpsParts[0]},${gpsParts[1]}">${escaparHtml(finca.gps)}</a>`
+          : escaparHtml(finca.gps || "No registrado");
+        resumen.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-sm font-bold text-emerald-200">Origen verificado</h3><span class="rounded-full bg-emerald-500/15 px-2 py-1 font-semibold text-emerald-200">${lote.autentico ? "Lote auténtico" : "Sin verificar"}</span></div>
+          ${lote.estado === "Vendido" ? '<p class="rounded-lg border border-amber-400/40 bg-amber-400/10 p-2 text-amber-100">Este lote ya fue vendido. Se muestra su historial completo para consulta; el QR no debe reutilizarse.</p>' : ""}
+          <div class="grid gap-2 rounded-lg bg-black/20 p-2 sm:grid-cols-2">
+            <p><strong>Código:</strong> ${escaparHtml(lote.id)}</p><p><strong>Estado actual:</strong> ${escaparHtml(lote.estado)}</p>
+            <p><strong>Variedad:</strong> ${escaparHtml(lote.variedad)}</p><p><strong>Producción:</strong> ${escaparHtml(lote.pesoKg)} kg</p>
+            <p><strong>Fecha de cosecha:</strong> ${escaparHtml(lote.fechaCosecha)}</p><p><strong>QR:</strong> ${lote.qrGenerado ? "Generado" : "Pendiente"}</p>
+          </div>
+          <div class="rounded-lg bg-black/20 p-2"><strong class="text-lime-200">Finca de origen</strong><p>${escaparHtml(finca.nombre || "Sin nombre")}</p><p>Registro ICA: ${escaparHtml(finca.registroICA || "No registrado")}</p><p>Ubicación: ${gpsLink}</p><p>Productor: ${escaparHtml(finca.productorWallet || "No registrado")}</p>${finca.certificadoPdfUrl ? `<a class="text-cyan-300 underline" target="_blank" rel="noopener" href="${escaparHtml(finca.certificadoPdfUrl)}">Ver certificado ICA</a>` : ""}</div>
+          <div class="rounded-lg bg-black/20 p-2"><strong class="text-cyan-200">Inspección de calidad</strong><p>${calidad ? `${calidad.aprobada ? "Aprobada" : "Rechazada"} · ${escaparHtml(calidad.evaluacionFitosanitaria)} · Humedad ${escaparHtml(calidad.humedad)}% · Temperatura ${escaparHtml(calidad.temperaturaC)}°C · ${escaparHtml(calidad.firmadoEn)}` : "Todavía no tiene inspección registrada."}</p>${calidad?.informePdfUrl ? `<a class="text-cyan-300 underline" target="_blank" rel="noopener" href="${escaparHtml(calidad.informePdfUrl)}">Ver informe de calidad</a>` : ""}</div>
+          <div class="rounded-lg bg-black/20 p-2"><strong class="text-violet-200">Proceso completo del lote</strong><p class="mb-2 text-slate-400">Seguimiento cronológico desde el registro hasta la entrega y venta.</p><ol class="ml-1 mt-2">${htmlEtapas}</ol>${actividadRuta.length ? `<div class="mt-2 border-t border-slate-700 pt-2"><strong class="text-amber-200">Actividad durante el transporte</strong><ul class="mt-1 space-y-1">${actividadRuta.map((evento) => `<li class="border-l border-slate-700 pl-2"><strong>${escaparHtml(evento.tipo)}</strong> · ${fechaLocal(evento.fecha)}<br>${escaparHtml(evento.detalle)}</li>`).join("")}</ul></div>` : ""}<p class="mt-2 break-all text-[10px] text-slate-500">Hash de registro (simulado): ${escaparHtml(lote.txHashRegistro)}</p></div>`;
+        resumen.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        show("Resumen de origen cargado.");
+      } catch (error) {
+        resumen.innerHTML = `<p class="font-semibold text-rose-300">No se pudo verificar este lote.</p><p class="text-slate-300">${escaparHtml(error?.error || "Intenta de nuevo.")}</p>`;
+        show(error, false);
+      }
+    };
+
+    document.querySelector("#venderLote").onclick = () => run(async () => {
+      const data = await api(`/api/v1/lotes/${document.querySelector("#consultaLote").value}/venta`, {
+        method: "POST",
+        body: { vendedorId: usuarioActual.walletAddress, rol: usuarioActual.rol }
+      });
+      await refrescarLotes();
+      return data;
+    });
+
+    const cargarBloques = async (recargar = true) => {
+      const lotes = recargar || !lotesAdminCache.length ? await api("/api/v1/lotes") : lotesAdminCache;
+      lotesAdminCache = lotes;
+      const detalleSelect = document.querySelector("#loteAdminDetalle");
+      const detallePrevio = detalleSelect.value;
+      detalleSelect.innerHTML = lotes.length
+        ? lotes.map((lote) => `<option value="${lote.id}">${lote.id} — ${lote.estado}</option>`).join("")
+        : `<option value="">No hay lotes registrados</option>`;
+      if (lotes.some((lote) => lote.id === detallePrevio)) detalleSelect.value = detallePrevio;
+      const termino = normalizarBusqueda(document.querySelector("#filtroLotesAdmin").value);
+      const estadoSeleccionado = document.querySelector("#filtroEstadoLoteAdmin").value;
+      const fincasPorId = new Map(fincasAdminCache.map((finca) => [finca.id, finca]));
+      const productoresPorWallet = new Map(productoresRegistrados.map((productor) => [productor.walletAddress, productor.nombre]));
+      const filtrados = lotes.filter((lote) => {
+        const finca = fincasPorId.get(lote.fincaId);
+        const texto = normalizarBusqueda([lote.id, lote.variedad, lote.estado, lote.productorWallet, productoresPorWallet.get(lote.productorWallet), finca?.nombre, finca?.registroICA, lote.conductorId].join(" "));
+        return (!termino || texto.includes(termino)) && (!estadoSeleccionado || lote.estado === estadoSeleccionado);
+      });
+      document.querySelector("#resultadoLotesAdmin").textContent = `Mostrando ${filtrados.length} de ${lotes.length} lote(s).`;
+      document.querySelector("#bloquesTable").innerHTML = filtrados.map((lote) => {
+        const finca = fincasPorId.get(lote.fincaId);
+        const productor = productoresPorWallet.get(lote.productorWallet) || lote.productorWallet;
+        return `
+        <tr>
+          <td class="font-mono text-lime-200">${escaparHtml(lote.id)}</td>
+          <td><span>${escaparHtml(finca?.nombre || lote.fincaId)}</span><br><span class="text-slate-400">${escaparHtml(productor)}</span></td>
+          <td><input class="control admin-variedad !p-1 !text-[10px]" data-id="${escaparHtml(lote.id)}" value="${escaparHtml(lote.variedad)}" /></td>
+          <td><input class="control admin-peso !p-1 !text-[10px]" data-id="${escaparHtml(lote.id)}" type="number" value="${Number(lote.pesoKg) || 0}" /></td>
+          <td><span class="text-[10px]">${escaparHtml(lote.estado)}</span>${lote.rutaDespacho ? `<br><span class="text-[9px] text-slate-400">${escaparHtml(lote.rutaDespacho.origenMunicipio)} → ${escaparHtml(lote.rutaDespacho.destinoMunicipio)}</span>` : ""}</td>
+          <td>
+            <div class="flex gap-1">
+              <button class="btn btn-secondary !p-1 !min-h-0" onclick="verDetalleLote('${escaparHtml(lote.id)}')" title="Ver detalle"><i data-lucide="eye" class="w-3 h-3"></i></button>
+              <button class="btn btn-secondary !p-1 !min-h-0" onclick="editarBloque('${escaparHtml(lote.id)}')"><i data-lucide="pencil" class="w-3 h-3"></i></button>
+              <button class="btn btn-danger !p-1 !min-h-0" onclick="eliminarBloque('${escaparHtml(lote.id)}')"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+            </div>
+          </td>
+        </tr>
+      `; }).join("") || `<tr><td colspan="6" class="text-slate-400 text-center">No hay lotes que coincidan con los filtros.</td></tr>`;
+      lucide.createIcons();
+      renderLoteSelects(lotes);
+      return lotes;
+    };
+
+    const escaparHtml = (valor) => String(valor ?? "—").replace(/[&<>"']/g, (caracter) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    })[caracter]);
+    const normalizarBusqueda = (valor) => String(valor ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLocaleLowerCase("es");
+
+    const renderSeguimientoProductor = (lotes, premium = accesoPremium) => {
+      const panel = document.querySelector("#seguimientoProductor");
+      panel.innerHTML = lotes.length ? lotes.map((lote) => `
+        <article class="flex flex-col gap-2 rounded-lg bg-black/20 p-2 sm:flex-row sm:items-center sm:justify-between">
+          <div><strong>${escaparHtml(lote.id)}</strong> · ${escaparHtml(lote.estado)}<br><span class="text-slate-400">${escaparHtml(lote.pesoKg)} kg · ${escaparHtml(lote.variedad)} · Cosecha ${escaparHtml(lote.fechaCosecha)}</span></div>
+          <button class="btn btn-secondary productor-detalle !px-2 !py-1" data-id="${escaparHtml(lote.id)}" ${premium ? "" : "disabled title=\"Disponible con Premium\""}>${premium ? "Ver trazabilidad completa" : "Detalle · Premium"}</button>
+        </article>
+      `).join("") : `<p class="rounded-lg bg-black/20 p-2">Aún no tienes lotes registrados.</p>`;
+      panel.querySelectorAll(".productor-detalle").forEach((button) => button.addEventListener("click", () => window.verDetalleLoteProductor(button.dataset.id)));
+      return lotes;
+    };
+
+    window.verDetalleLoteProductor = (idLote) => run(async () => {
+      const detalle = await api(`/api/v1/productor/lotes/${encodeURIComponent(idLote)}`);
+      const target = document.querySelector("#detalleProductor");
+      const puntoGps = (ubicacion) => ubicacion && Number.isFinite(ubicacion.latitud) && Number.isFinite(ubicacion.longitud)
+        ? `<a class="text-cyan-300 underline" target="_blank" rel="noopener" href="https://maps.google.com/?q=${ubicacion.latitud},${ubicacion.longitud}">${escaparHtml(ubicacion.latitud)}, ${escaparHtml(ubicacion.longitud)}</a>` : "GPS no disponible";
+      const incidentes = detalle.incidentes?.length ? detalle.incidentes.slice().reverse().map((item) => `<li class="rounded-lg border border-amber-500/20 p-2"><strong>${escaparHtml(item.tipo)}</strong> · ${escaparHtml(item.comentario)}<br><span class="text-slate-400">${escaparHtml(item.creadoEn)} · ${puntoGps(item.ubicacion)}</span></li>`).join("") : "<li>Sin incidentes.</li>";
+      const puntos = detalle.puntosControlRuta?.length ? detalle.puntosControlRuta.slice().reverse().map((item) => `<li class="rounded-lg border border-sky-500/20 p-2">${puntoGps(item.ubicacion)} · ${escaparHtml(item.ubicacion?.referencia || "Sin referencia")} · ${escaparHtml(item.registradoEn)}${item.observacion ? `<br>${escaparHtml(item.observacion)}` : ""}</li>`).join("") : "<li>Sin puntos de control.</li>";
+      const eventos = detalle.eventos?.length ? detalle.eventos.slice().reverse().map((item) => `<li class="border-l border-slate-700 pl-2"><strong>${escaparHtml(item.tipo)}</strong> · ${escaparHtml(item.fecha)}<br>${escaparHtml(item.detalle)}${item.txHash ? `<br><span class="break-all text-slate-500">Hash: ${escaparHtml(item.txHash)}</span>` : ""}</li>`).join("") : "<li>Sin historial.</li>";
+      target.innerHTML = `
+        <div class="flex items-center justify-between gap-2"><h4 class="font-bold text-lime-200">Ficha completa · ${escaparHtml(detalle.id)}</h4><button id="cerrarDetalleProductor" class="btn btn-secondary !px-2 !py-1">Cerrar</button></div>
+        <section class="grid gap-2 rounded-lg bg-black/20 p-2 sm:grid-cols-2"><p><strong>Estado:</strong> ${escaparHtml(detalle.estado)}</p><p><strong>Producto:</strong> ${escaparHtml(detalle.variedad)} · ${escaparHtml(detalle.pesoKg)} kg</p><p><strong>Cosecha:</strong> ${escaparHtml(detalle.fechaCosecha)}</p><p><strong>Finca:</strong> ${escaparHtml(detalle.finca?.nombre || detalle.fincaId)}</p><p><strong>Registro blockchain:</strong> <span class="break-all">${escaparHtml(detalle.txHashRegistro)}</span></p><p><strong>QR:</strong> ${detalle.qrGenerado ? "Generado" : "No generado"}</p><p class="sm:col-span-2"><strong>Ubicación de seguimiento:</strong> ${escaparHtml(detalle.ubicacionActual?.descripcion || "Sin ubicación reportada")}</p><p class="sm:col-span-2"><strong>Último punto GPS:</strong> ${puntoGps(detalle.ultimaUbicacionGPS)}${detalle.ultimaUbicacionGPS ? ` · ${escaparHtml(detalle.ultimaUbicacionGPS.incidente || "Punto de control")} · ${escaparHtml(detalle.ultimaUbicacionGPS.reportadaEn)}` : ""}</p></section>
+        <section class="rounded-lg bg-black/20 p-2"><strong class="text-cyan-200">Inspección de calidad</strong><p>${detalle.inspeccionCalidad ? `${detalle.inspeccionCalidad.aprobada ? "Aprobada" : "Rechazada"} · ${escaparHtml(detalle.inspeccionCalidad.destino)} · Fitosanitaria: ${escaparHtml(detalle.inspeccionCalidad.evaluacionFitosanitaria)} · Humedad ${escaparHtml(detalle.inspeccionCalidad.humedad)}% · Temperatura ${escaparHtml(detalle.inspeccionCalidad.temperaturaC)}°C · Inspector ${escaparHtml(detalle.inspeccionCalidad.inspectorId)} · ${escaparHtml(detalle.inspeccionCalidad.firmadoEn)}${detalle.inspeccionCalidad.informePdfUrl ? ` · <a class="text-cyan-300 underline" target="_blank" rel="noopener" href="${escaparHtml(detalle.inspeccionCalidad.informePdfUrl)}">Informe PDF</a>` : ""}` : "Pendiente de inspección."}</p></section>
+        <section class="rounded-lg bg-black/20 p-2"><strong class="text-sky-200">Trayecto, despacho y recepción</strong><p>${detalle.rutaDespacho ? `Sale desde ${escaparHtml(detalle.rutaDespacho.origenMunicipio)} y llega a ${escaparHtml(detalle.rutaDespacho.destinoMunicipio)}${detalle.rutaDespacho.destinoDetalle ? ` · ${escaparHtml(detalle.rutaDespacho.destinoDetalle)}` : ""}` : "Ruta pendiente de asignación."}</p><p>Transportador: ${escaparHtml(detalle.conductorId || "Sin asignar")}</p><p>${detalle.recepcionDestino ? `Recibido por ${escaparHtml(detalle.recepcionDestino.recibidoPor)} · ${escaparHtml(detalle.recepcionDestino.temperaturaC)}°C · ${escaparHtml(detalle.recepcionDestino.cajasDanadas)} cajas dañadas · ${escaparHtml(detalle.recepcionDestino.recibidoEn)}` : "Aún no se ha confirmado la recepción."}</p></section>
+        <section><strong class="text-amber-200">Incidentes (${detalle.incidentes?.length || 0})</strong><ul class="mt-1 space-y-1">${incidentes}</ul></section>
+        <section><strong class="text-sky-200">Puntos de control (${detalle.puntosControlRuta?.length || 0})</strong><ul class="mt-1 space-y-1">${puntos}</ul></section>
+        <section><strong class="text-violet-200">Evidencias</strong><ul>${detalle.evidencias?.length ? detalle.evidencias.map((item) => `<li><a class="text-cyan-300 underline" target="_blank" rel="noopener" href="${escaparHtml(item.url)}">${escaparHtml(item.filename)}</a></li>`).join("") : "<li>Sin evidencias.</li>"}</ul></section>
+        <section><strong class="text-violet-200">Historial de trazabilidad</strong><ul class="mt-1 max-h-48 space-y-1 overflow-y-auto">${eventos}</ul></section>`;
+      target.classList.remove("hidden");
+      document.querySelector("#cerrarDetalleProductor").onclick = () => target.classList.add("hidden");
+      return detalle;
+    });
+
+    window.verDetalleLote = (idLote = document.querySelector("#loteAdminDetalle").value) => run(async () => {
+      if (!idLote) throw new Error("No hay lotes para consultar.");
+      const detalle = await api(`/api/v1/admin/lotes/${encodeURIComponent(idLote)}?email=${encodeURIComponent(correoPremium())}`);
+      document.querySelector("#loteAdminDetalle").value = idLote;
+      const ubicacion = detalle.ubicacionActual || {};
+      const ultimaGps = detalle.ultimaUbicacionGPS;
+      const mapaGps = (posicion) => posicion && Number.isFinite(posicion.latitud) && Number.isFinite(posicion.longitud)
+        ? `<a class="text-cyan-300 underline" target="_blank" rel="noopener" href="https://maps.google.com/?q=${posicion.latitud},${posicion.longitud}">${escaparHtml(posicion.latitud)}, ${escaparHtml(posicion.longitud)}</a>`
+        : "Ubicación GPS no disponible";
+      const incidentes = detalle.incidentes?.length
+        ? detalle.incidentes.slice().reverse().map((incidente) => {
+          const coords = incidente.ubicacion
+            ? `${escaparHtml(incidente.ubicacion.latitud)}, ${escaparHtml(incidente.ubicacion.longitud)}${incidente.ubicacion.referencia ? ` · ${escaparHtml(incidente.ubicacion.referencia)}` : ""}`
+            : "Sin GPS adjunto";
+          return `<li class="rounded-lg border border-amber-500/20 bg-black/20 p-2"><strong class="text-amber-200">${escaparHtml(incidente.tipo)}</strong><p>${escaparHtml(incidente.comentario)}</p><p class="text-slate-400">${escaparHtml(new Date(incidente.creadoEn).toLocaleString())} · ${coords}</p></li>`;
+        }).join("")
+        : `<li class="text-slate-400">Sin incidentes reportados.</li>`;
+      const eventos = detalle.eventos?.length
+        ? detalle.eventos.slice().reverse().map((evento) => `<li class="border-l border-slate-700 pl-2"><strong>${escaparHtml(evento.tipo)}</strong> · ${escaparHtml(evento.fecha)}<br>${escaparHtml(evento.detalle)}</li>`).join("")
+        : `<li class="text-slate-400">Sin eventos.</li>`;
+      const puntosControl = detalle.puntosControlRuta?.length
+        ? detalle.puntosControlRuta.slice().reverse().map((punto) => `<li class="rounded-lg border border-sky-500/20 bg-black/20 p-2">${mapaGps(punto.ubicacion)} · ${escaparHtml(punto.ubicacion.referencia || "Sin referencia")} · ${escaparHtml(new Date(punto.registradoEn).toLocaleString())}${punto.observacion ? `<br>${escaparHtml(punto.observacion)}` : ""}</li>`).join("")
+        : `<li class="text-slate-400">Sin puntos de control registrados.</li>`;
+      document.querySelector("#detalleLoteAdmin").innerHTML = `
+        <div class="grid grid-cols-2 gap-2 rounded-lg bg-black/25 p-2">
+          <p><strong>Lote:</strong> ${escaparHtml(detalle.id)}</p><p><strong>Estado:</strong> ${escaparHtml(detalle.estado)}</p>
+          <p><strong>Producto:</strong> ${escaparHtml(detalle.variedad)} · ${escaparHtml(detalle.pesoKg)} kg</p><p><strong>Cosecha:</strong> ${escaparHtml(detalle.fechaCosecha)}</p>
+          <p><strong>Finca:</strong> ${escaparHtml(detalle.finca?.nombre || detalle.fincaId)}</p><p><strong>QR:</strong> ${detalle.qrGenerado ? "Generado" : "No generado"}</p>
+          <p class="col-span-2"><strong>Ubicación según estado:</strong> ${escaparHtml(ubicacion.descripcion || mapaGps(ubicacion))}</p>
+          <p class="col-span-2"><strong>Último GPS reportado:</strong> ${mapaGps(ultimaGps)}${ultimaGps ? ` · ${escaparHtml(ultimaGps.incidente)} · ${escaparHtml(new Date(ultimaGps.reportadaEn).toLocaleString())}` : ""}</p>
+          <p class="col-span-2 text-slate-400">El GPS corresponde al último reporte del conductor; no es seguimiento en tiempo real.</p>
+        </div>
+        <div class="rounded-lg bg-black/20 p-2"><strong class="text-cyan-200">Inspección de calidad</strong><p>${detalle.inspeccionCalidad ? `${detalle.inspeccionCalidad.aprobada ? "Aprobada" : "Rechazada"} · ${escaparHtml(detalle.inspeccionCalidad.destino)} · Humedad ${escaparHtml(detalle.inspeccionCalidad.humedad)}% · Temperatura ${escaparHtml(detalle.inspeccionCalidad.temperaturaC)}°C · ${escaparHtml(detalle.inspeccionCalidad.evaluacionFitosanitaria)} · ${escaparHtml(detalle.inspeccionCalidad.informePdfUrl)}` : "Sin inspección registrada."}</p></div>
+        <div class="rounded-lg bg-black/20 p-2"><strong class="text-sky-200">Trayecto y despacho</strong><p>${detalle.rutaDespacho ? `Sale desde ${escaparHtml(detalle.rutaDespacho.origenMunicipio)} y llega a ${escaparHtml(detalle.rutaDespacho.destinoMunicipio)}${detalle.rutaDespacho.destinoDetalle ? ` · ${escaparHtml(detalle.rutaDespacho.destinoDetalle)}` : ""}` : "Ruta pendiente de asignación."}</p><p>Conductor: ${escaparHtml(detalle.conductorId || "Sin conductor asignado")} · ${escaparHtml(detalle.eventos?.filter((evento) => evento.tipo === "Despacho").slice(-1)[0]?.fecha || "Sin fecha")}</p></div>
+        <div class="rounded-lg bg-black/20 p-2"><strong class="text-emerald-200">Recepción en destino</strong><p>${detalle.recepcionDestino ? `${escaparHtml(detalle.recepcionDestino.temperaturaC)}°C · ${escaparHtml(detalle.recepcionDestino.cajasDanadas)} cajas dañadas · ${escaparHtml(detalle.recepcionDestino.recibidoPor)} · ${escaparHtml(new Date(detalle.recepcionDestino.recibidoEn).toLocaleString())}` : "Sin recepción registrada."}</p></div>
+        <div class="rounded-lg bg-black/20 p-2"><strong class="text-lime-200">Evidencias</strong><ul>${detalle.evidencias?.length ? detalle.evidencias.map((evidencia) => `<li><a class="text-cyan-300 underline" href="${escaparHtml(evidencia.url)}" target="_blank" rel="noopener">${escaparHtml(evidencia.filename)}</a></li>`).join("") : "<li>Sin evidencias.</li>"}</ul></div>
+        <div class="rounded-lg bg-black/20 p-2"><strong class="text-lime-200">Blockchain</strong><p>Registro: ${escaparHtml(detalle.txHashRegistro)}</p><p>Venta: ${escaparHtml(detalle.eventos?.filter((evento) => evento.tipo === "Venta").slice(-1)[0]?.txHash || "Sin venta registrada")}</p></div>
+        <div><strong class="text-amber-200">Incidentes (${detalle.incidentes?.length || 0})</strong><ul class="mt-1 space-y-1">${incidentes}</ul></div>
+        <div><strong class="text-sky-200">Puntos de control (${detalle.puntosControlRuta?.length || 0})</strong><ul class="mt-1 space-y-1">${puntosControl}</ul></div>
+        <div><strong class="text-violet-200">Historial</strong><ul class="mt-1 max-h-36 space-y-1 overflow-y-auto">${eventos}</ul></div>`;
+      return detalle;
+    });
+
+    document.querySelector("#verDetalleLote").onclick = () => window.verDetalleLote();
+
+    const descargarFichaFincaPdf = (finca) => {
+      const normalizar = (valor) => String(valor ?? "No registrado")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x20-\x7E]/g, " ");
+      const escaparPdf = (valor) => normalizar(valor).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+      const textos = [
+        "AVOCHAIN - FICHA INFORMATIVA DE FINCA",
+        "",
+        `Nombre: ${normalizar(finca.nombre)}`,
+        `Codigo de finca: ${normalizar(finca.id)}`,
+        `Registro ICA: ${normalizar(finca.registroICA)}`,
+        `Ubicacion GPS: ${normalizar(finca.gps)}`,
+        `Productor: ${normalizar(finca.productorNombre || finca.productorWallet)}`,
+        `Estado: ${finca.activa ? "Activa" : "Inactiva"}`,
+        `Generado: ${new Date().toLocaleString("es-CO")}`,
+        "",
+        "Este documento es una ficha informativa generada por AvoChain.",
+        "No reemplaza el certificado oficial expedido por el ICA."
+      ];
+      const lineas = textos.flatMap((texto) => {
+        if (!texto) return [""];
+        const palabras = texto.split(/\s+/);
+        const resultado = [];
+        let linea = "";
+        for (const palabra of palabras) {
+          if (`${linea} ${palabra}`.trim().length > 82 && linea) { resultado.push(linea); linea = palabra; }
+          else linea = `${linea} ${palabra}`.trim();
+        }
+        if (linea) resultado.push(linea);
+        return resultado;
+      });
+      const comandos = ["BT", "/F1 16 Tf", "50 790 Td"];
+      lineas.forEach((linea, indice) => {
+        if (indice === 1) comandos.push("/F1 11 Tf");
+        if (indice > 0) comandos.push("0 -27 Td");
+        comandos.push(`(${escaparPdf(linea)}) Tj`);
+      });
+      comandos.push("ET");
+      const contenido = comandos.join("\n");
+      const objetos = [
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        `<< /Length ${contenido.length} >>\nstream\n${contenido}\nendstream`
+      ];
+      let pdf = "%PDF-1.4\n";
+      const offsets = [0];
+      objetos.forEach((objeto, indice) => {
+        offsets.push(pdf.length);
+        pdf += `${indice + 1} 0 obj\n${objeto}\nendobj\n`;
+      });
+      const inicioXref = pdf.length;
+      pdf += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n`;
+      offsets.slice(1).forEach((offset) => { pdf += `${String(offset).padStart(10, "0")} 00000 n \n`; });
+      pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${inicioXref}\n%%EOF`;
+      const url = URL.createObjectURL(new Blob([pdf], { type: "application/pdf" }));
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = `ficha-${String(finca.id).replace(/[^a-zA-Z0-9_-]/g, "-")}.pdf`;
+      document.body.append(enlace);
+      enlace.click();
+      enlace.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+
+    const cargarFincasAdmin = async (recargar = true) => {
+      const fincas = recargar || !fincasAdminCache.length ? await api("/api/v1/fincas") : fincasAdminCache;
+      fincasAdminCache = fincas;
+      const termino = normalizarBusqueda(document.querySelector("#filtroFincasAdmin").value);
+      const productorFiltro = document.querySelector("#filtroProductorFincaAdmin").value;
+      const productorPorWallet = new Map(productoresRegistrados.map((productor) => [productor.walletAddress, productor.nombre]));
+      const filtradas = fincas.filter((finca) => {
+        const texto = normalizarBusqueda([finca.nombre, finca.id, finca.registroICA, finca.gps, finca.productorWallet, productorPorWallet.get(finca.productorWallet)].join(" "));
+        return (!termino || texto.includes(termino)) && (!productorFiltro || finca.productorWallet === productorFiltro);
+      });
+      const tbody = document.querySelector("#fincasAdminTable");
+      document.querySelector("#resultadoFincasAdmin").textContent = `Mostrando ${filtradas.length} de ${fincas.length} finca(s).`;
+      tbody.innerHTML = filtradas.map((finca) => `
+        <tr>
+          <td><input class="control finca-nombre !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}" value="${escaparHtml(finca.nombre)}" /><span class="text-slate-500">${escaparHtml(finca.id)}</span></td>
+          <td><input class="control finca-ica !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}" value="${escaparHtml(finca.registroICA)}" /></td>
+          <td><input class="control finca-gps !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}" value="${escaparHtml(finca.gps)}" /></td>
+          <td><select class="control finca-productor !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}">${productoresRegistrados.map((p) => `<option value="${escaparHtml(p.walletAddress)}" ${p.walletAddress === finca.productorWallet ? "selected" : ""}>${escaparHtml(p.nombre)}</option>`).join("")}</select></td>
+          <td><span class="block text-[10px] ${finca.estadoAprobacion === "Pendiente" ? "text-amber-300" : "text-emerald-300"}">${escaparHtml(finca.estadoAprobacion === "Pendiente" ? "Pendiente de aprobación" : finca.estadoAprobacion || (finca.activa ? "Aprobada" : "Inactiva"))}</span><select class="control finca-activa mt-1 !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}"><option value="true" ${finca.activa ? "selected" : ""}>Activa</option><option value="false" ${!finca.activa ? "selected" : ""}>Inactiva</option></select></td>
+          <td><button class="btn btn-secondary finca-pdf !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}" title="Descargar ficha informativa de la finca en PDF">PDF</button></td>
+          <td><button class="btn btn-secondary finca-guardar !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}">Guardar</button>${finca.estadoAprobacion === "Pendiente" ? `<button class="btn btn-primary finca-aprobar mt-1 !p-1 !text-[10px]" data-id="${escaparHtml(finca.id)}">Aprobar</button>` : ""}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="7" class="text-center text-slate-400">No hay fincas registradas.</td></tr>`;
+      tbody.querySelectorAll(".finca-guardar").forEach((button) => button.addEventListener("click", () => window.editarFinca(button.dataset.id)));
+      tbody.querySelectorAll(".finca-aprobar").forEach((button) => button.addEventListener("click", () => run(async () => {
+        const finca = await api(`/api/v1/admin/fincas/${encodeURIComponent(button.dataset.id)}/aprobar`, { method: "PATCH", body: {} });
+        await cargarFincasAdmin();
+        return { mensaje: `Finca ${finca.nombre} aprobada. El productor ya puede usarla para registrar lotes.` };
+      })));
+      tbody.querySelectorAll(".finca-pdf").forEach((button) => button.addEventListener("click", () => {
+        const finca = fincas.find((item) => item.id === button.dataset.id);
+        if (finca) descargarFichaFincaPdf(finca);
+      }));
+      return fincas;
+    };
+
+    const cargarUsuariosAdmin = async (recargar = true) => {
+      const usuarios = recargar || !usuariosAdminCache.length ? await api("/api/v1/usuarios") : usuariosAdminCache;
+      usuariosAdminCache = usuarios;
+      const termino = normalizarBusqueda(document.querySelector("#filtroUsuariosAdmin").value);
+      const rolFiltro = document.querySelector("#filtroRolUsuarioAdmin").value;
+      const filtrados = usuarios.filter((usuario) => {
+        const texto = normalizarBusqueda([usuario.nombre, usuario.email, usuario.walletAddress, usuario.rol].join(" "));
+        return (!termino || texto.includes(termino)) && (!rolFiltro || usuario.rol === rolFiltro);
+      });
+      const rolesEditables = ["Productor", "Inspector de calidad", "Bodeguero", "Transportador", "Receptor", "Vendedor"];
+      const tbody = document.querySelector("#usuariosAdminTable");
+      document.querySelector("#resultadoUsuariosAdmin").textContent = `Mostrando ${filtrados.length} de ${usuarios.length} usuario(s).`;
+      tbody.innerHTML = filtrados.map((usuario) => `
+        <tr>
+          <td><input class="control usuario-nombre !p-1 !text-[10px]" data-id="${escaparHtml(usuario.id)}" value="${escaparHtml(usuario.nombre)}" /></td>
+          <td><input class="control usuario-email !p-1 !text-[10px]" data-id="${escaparHtml(usuario.id)}" value="${escaparHtml(usuario.email || "")}" /></td>
+          <td>${usuario.rol === "Administrador" ? `<span>Administrador</span>` : `<select class="control usuario-rol !p-1 !text-[10px]" data-id="${escaparHtml(usuario.id)}">${rolesEditables.map((rol) => `<option ${rol === usuario.rol ? "selected" : ""}>${rol}</option>`).join("")}</select>`}</td>
+          <td class="break-all">${escaparHtml(usuario.walletAddress)}</td>
+          <td><select class="control usuario-activo !p-1 !text-[10px]" data-id="${escaparHtml(usuario.id)}"><option value="true" ${usuario.estadoActivo ? "selected" : ""}>Activo</option><option value="false" ${!usuario.estadoActivo ? "selected" : ""}>Inactivo</option></select></td>
+          <td><input class="control usuario-password !p-1 !text-[10px]" data-id="${escaparHtml(usuario.id)}" type="password" minlength="10" placeholder="Nueva contraseña opcional" /></td>
+          <td><button class="btn btn-secondary usuario-guardar !p-1 !text-[10px]" data-id="${escaparHtml(usuario.id)}">Guardar</button></td>
+        </tr>
+      `).join("") || `<tr><td colspan="7" class="text-center text-slate-400">No hay usuarios registrados.</td></tr>`;
+      tbody.querySelectorAll(".usuario-guardar").forEach((button) => button.addEventListener("click", () => window.editarUsuario(button.dataset.id)));
+      return usuarios;
+    };
+
+    const cargarSolicitudesVinculacion = async () => {
+      const host = document.querySelector("#solicitudesAdmin");
+      const solicitudes = await api("/api/v1/admin/vinculaciones");
+      host.innerHTML = solicitudes.map((s) => `<article class="rounded-lg border border-slate-700 p-2"><div class="flex flex-wrap items-center justify-between gap-2"><div><strong>${escaparHtml(s.nombre)}</strong> · ${escaparHtml(s.email)} · ${escaparHtml(s.rol)}<div class="text-slate-400">${escaparHtml(s.municipio || "")} · ${new Date(s.fechaSolicitud).toLocaleString()}</div></div><span class="badge ${s.estado === "Pendiente" ? "bg-amber-500/20 text-amber-200" : s.estado === "Aprobada" ? "bg-emerald-500/20 text-emerald-200" : "bg-rose-500/20 text-rose-200"}">${escaparHtml(s.estado)}</span></div><div class="mt-2 flex flex-wrap gap-1">${(s.documentos || []).map((d, i) => `<button class="btn btn-secondary !px-2 !py-1 solicitud-doc" data-id="${escaparHtml(s._id)}" data-index="${i}">${escaparHtml(d.nombreArchivo)} · ${(Number(d.sizeBytes) / 1024).toFixed(0)} KB</button>`).join("")}</div>${s.estado === "Pendiente" ? `<div class="mt-2 flex gap-2"><button class="btn btn-primary !px-2 !py-1 solicitud-aprobar" data-id="${escaparHtml(s._id)}">Aprobar y enviar enlace</button><button class="btn btn-danger !px-2 !py-1 solicitud-rechazar" data-id="${escaparHtml(s._id)}">Rechazar</button></div>` : ""}</article>`).join("") || `<p class="text-slate-400">Aún no hay solicitudes.</p>`;
+      host.querySelectorAll(".solicitud-doc").forEach((b) => b.onclick = async () => {
+        const response = await fetch(`/api/v1/admin/vinculaciones/${b.dataset.id}/documentos/${b.dataset.index}`, { headers: { Authorization: `Bearer ${tokenSesion}` } });
+        if (!response.ok) throw new Error("No se pudo descargar el documento.");
+        const url = URL.createObjectURL(await response.blob()); const a = document.createElement("a"); a.href = url; a.download = b.textContent.split(" · ")[0]; a.click(); URL.revokeObjectURL(url);
+      });
+      host.querySelectorAll(".solicitud-aprobar").forEach((b) => b.onclick = () => run(async () => { const r = await api(`/api/v1/admin/vinculaciones/${b.dataset.id}/aprobar`, { method: "POST", body: {} }); await cargarSolicitudesVinculacion(); return r; }));
+      host.querySelectorAll(".solicitud-rechazar").forEach((b) => b.onclick = () => run(async () => { const motivo = prompt("Motivo del rechazo:"); if (!motivo?.trim()) throw new Error("Escribe un motivo para rechazar."); const r = await api(`/api/v1/admin/vinculaciones/${b.dataset.id}/rechazar`, { method: "POST", body: { motivo } }); await cargarSolicitudesVinculacion(); return r; }));
+      return solicitudes;
+    };
+
+    document.querySelector("#filtroUsuariosAdmin").addEventListener("input", () => cargarUsuariosAdmin(false));
+    document.querySelector("#filtroRolUsuarioAdmin").addEventListener("change", () => cargarUsuariosAdmin(false));
+    document.querySelector("#filtroFincasAdmin").addEventListener("input", () => cargarFincasAdmin(false));
+    document.querySelector("#filtroProductorFincaAdmin").addEventListener("change", () => cargarFincasAdmin(false));
+    document.querySelector("#filtroLotesAdmin").addEventListener("input", () => cargarBloques(false));
+    document.querySelector("#filtroEstadoLoteAdmin").addEventListener("change", () => cargarBloques(false));
+
+    window.editarUsuario = (id) => run(async () => {
+      const campo = (clase) => document.querySelector(`.${clase}[data-id="${id}"]`);
+      const body = { nombre: campo("usuario-nombre").value, email: campo("usuario-email").value, estadoActivo: campo("usuario-activo").value === "true" };
+      const roleSelect = campo("usuario-rol");
+      if (roleSelect) body.rol = roleSelect.value;
+      const password = campo("usuario-password").value;
+      if (password) body.password = password;
+      const user = await api(`/api/v1/usuarios/${encodeURIComponent(id)}`, { method: "PATCH", body });
+      await cargarUsuariosAdmin();
+      await cargarProductores();
+      await cargarFincasAdmin();
+      await cargarBloques(false);
+      return { mensaje: `Cambios guardados para ${user.nombre}.` };
+    });
+
+    window.editarFinca = (id) => run(async () => {
+      const campo = (clase) => document.querySelector(`.${clase}[data-id="${id}"]`);
+      const finca = await api(`/api/v1/fincas/${encodeURIComponent(id)}`, { method: "PATCH", body: {
+        nombre: campo("finca-nombre").value, registroICA: campo("finca-ica").value, gps: campo("finca-gps").value,
+        wallet: campo("finca-productor").value, activa: campo("finca-activa").value === "true"
+      }});
+      await cargarFincasAdmin();
+      return { mensaje: `Finca ${finca.nombre} actualizada.` };
+    });
+
+    window.editarBloque = (idLote) => run(async () => {
+      const variedad = document.querySelector(`.admin-variedad[data-id="${idLote}"]`).value;
+      const pesoKg = Number(document.querySelector(`.admin-peso[data-id="${idLote}"]`).value);
+      const data = await api(`/api/v1/lotes/${idLote}`, {
+        method: "PATCH",
+        body: { variedad, pesoKg, rol: "Administrador", email: correoPremium() }
+      });
+      await cargarBloques();
+      return data;
+    });
+
+    window.eliminarBloque = (idLote) => run(async () => {
+      const data = await api(`/api/v1/lotes/${idLote}?rol=Administrador&email=${encodeURIComponent(correoPremium())}`, { method: "DELETE" });
+      await cargarBloques();
+      return data;
+    });
+
+    if (tokenSesion) {
+      document.querySelector("#loginScreen").classList.add("hidden");
+      document.querySelector("#appShell").classList.remove("hidden");
+      cargarEstadoSesion().catch((error) => cerrarSesion(error?.error || "La sesión venció. Inicia sesión nuevamente."));
+    }
+    const parametrosPago = new URLSearchParams(window.location.search);
+    if (parametrosPago.has("wompi") && parametrosPago.has("id")) {
+      const transactionId = parametrosPago.get("id");
+      run(async () => {
+        const resultado = await api("/api/v1/pagos/wompi/verificar", { method: "POST", body: { transactionId } });
+        const estado = await actualizarEstadoPremium();
+        window.history.replaceState({}, "", window.location.pathname);
+        return { ...resultado, accesoPremium: estado.activo };
+      });
+    }
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>
