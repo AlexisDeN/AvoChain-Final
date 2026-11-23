@@ -4,14 +4,7 @@ Plataforma web para gestionar la trazabilidad de lotes de aguacate desde el regi
 
 El sistema está desarrollado con TypeScript, Node.js, Express y MongoDB. La persistencia principal es MongoDB; los adaptadores de blockchain y almacenamiento de evidencias son simulados en esta versión.
 
-<<<<<<< HEAD
-1. Copia `.env.example` como `.env` y configura credenciales privadas propias.
-2. Inicia MongoDB con `docker compose up -d mongo`.
-3. Instala dependencias con `npm install`.
-4. Ejecuta `npm start` y abre `http://localhost:3001`.
-=======
 ## Tabla de contenido
->>>>>>> 92fe3d7 (Actualizar README de AvoChain)
 
 - [Capacidades](#capacidades)
 - [Tecnologías](#tecnologías)
