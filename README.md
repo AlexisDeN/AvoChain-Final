@@ -94,7 +94,7 @@ Los patrones identificados en la implementación contribuyen a separar reglas y 
 
 ### Entregables complementarios
 
-Las [historias de usuario y los diagramas finales en PNG](https://drive.google.com/drive/folders/1oQ31i4B-G67fLRe4Xo4kfkV8QDMqmneJ?usp=sharing) se encuentran en la carpeta compartida del proyecto. El acceso debe estar habilitado para las personas encargadas de evaluar la entrega. Las fuentes editables del modelo C4 y del despliegue se mantienen en este repositorio para facilitar su revisión y actualización. El nivel C4 de código no está definido en el modelo actual; inclúyase únicamente si forma parte del alcance acordado para el proyecto.
+Las [historias de usuario y los diagramas finales en PNG](https://drive.google.com/drive/folders/1oQ31i4B-G67fLRe4Xo4kfkV8QDMqmneJ?usp=sharing) se encuentran en la carpeta compartida del proyecto.
 
 ## Requisitos
 
