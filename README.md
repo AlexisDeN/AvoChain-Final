@@ -4,7 +4,7 @@ Aplicación web adaptable para registrar la trazabilidad del aguacate. El backen
 
 ## Iniciar el proyecto
 
-1. Copia `.env.example` como `.env` y configura credenciales privadas propias. No compartas `.env`.
+1. Copia `.env.example` como `.env` y configura credenciales privadas propias.
 2. Inicia MongoDB con `docker compose up -d mongo`.
 3. Instala dependencias con `npm install`.
 4. Ejecuta `npm start` y abre `http://localhost:3001`.
